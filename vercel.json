@@ -1,5 +1,14 @@
 {
   "cleanUrls": true,
+  "framework": null,
+  "buildCommand": "pnpm build",
+  "outputDirectory": "dist",
+  "functions": {
+    "api/*.ts": {
+      "maxDuration": 60,
+      "memory": 1024
+    }
+  },
   "rewrites": [
     {
       "source": "/d/(.*)",
@@ -14,12 +23,26 @@
       "destination": "/api/[...route]"
     },
     {
+      "source": "/dav/(.*)",
+      "destination": "/api/[...route]"
+    },
+    {
+      "source": "/s3/(.*)",
+      "destination": "/api/[...route]"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api/[...route]"
     },
     {
-      "source": "/((?!api/|d/|sd/|p/).*)",
-      "destination": "/index.html"
+      "source": "/((?!api/|d/|sd/|p/|dav/|s3/).*)",
+      "destination": "/"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/task/refresh",
+      "schedule": "0 3 * * *"
     }
   ]
 }

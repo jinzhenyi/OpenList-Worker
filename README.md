@@ -3,7 +3,7 @@
 
   <p><em>OpenList 是一个多功能的目录列表工具，支持数十种网盘文件挂载和文件预览/下载/分享等功能</em></p>
   <p>本仓库是官方 <a href="https://github.com/OpenListTeam/OpenList">OpenListTeam/OpenList</a> 项目的 TypeScript + Serverless 架构移植版</p>
-  <p>基于 Cloudflare Workers / EdgeOne Cloud Function / Alibaba Cloud ESA 运行</p>
+  <p>基于 Cloudflare Workers / EdgeOne Cloud Function / Alibaba Cloud ESA / Vercel Serverless 运行</p>
 
 <a href="https://github.com/OpenListTeam/OpenList-Worker/blob/main/LICENSE"><img src="https://img.shields.io/github/license/OpenListTeam/OpenList-Worker" alt="License" /></a>
 <a href="https://github.com/OpenListTeam/OpenList-Worker/actions/workflows/edgeone-artifact-guard.yml"><img src="https://img.shields.io/github/actions/workflow/status/OpenListTeam/OpenList-Worker/edgeone-artifact-guard.yml?branch=main" alt="Build status" /></a>
@@ -45,7 +45,7 @@
 > - 若Cloudflare提示`无法获取存储库内容`，则您需要先[Fork](https://github.com/OpenListTeam/OpenList-Worker/fork)本项目，再通过连接到Github仓库功能部署
 > - 部署完成后配置环境变量： **EdgeOne**：[国际站](https://console.edgeone.ai/makers) · [中国站](https://console.cloud.tencent.com/edgeone/makers)；**Cloudflare**：[Worker 后台](https://dash.cloudflare.com/)，环境变量：
 >   - `DB_FORMAT`: 数据存储格式：`map` (默认，整对象JSON) / `key` (分key存储) / `sql` (关系表，与Go后端一致)
->   - `DB_DRIVER`: 数据库驱动：`auto` (默认，自动检测) / `blob` (EdgeOne Blob) / `cfkv` (CF KV API) / `kv` (KV binding) / `d1` (Cloudflare D1) / `mysql`
+>   - `DB_DRIVER`: 数据库驱动：`auto` (默认，自动检测) / `blob` (EdgeOne Blob) / `vblob` (Vercel Blob) / `cfkv` (CF KV API) / `kv` (KV binding) / `d1` (Cloudflare D1) / `mysql` / `postgres` (Neon / Vercel Postgres)
 >   - 其余可选变量参考**详细部署指南**：[Cloudflare](https://doc.oplist.org/guide/installation/worker#deploy-to-cloudflare-workers) · [EdgeOne](https://doc.oplist.org/guide/installation/worker#deploy-to-edgeone) · [ESA](https://doc.oplist.org/guide/installation/worker#deploy-to-alibaba-cloud-esa)
 
 
@@ -126,6 +126,57 @@ pnpm run deploy
 pnpm run deploy:worker
 ```
 
+### Vercel 部署（Hobby）
+
+入口为 `api/[...route].ts`（Node Serverless Runtime），路由、Cron 与函数规格见
+`vercel.json`。持久化使用 Vercel 平台自带存储（二选一或都连，`DB_DRIVER=auto`
+会自动挑选）：
+
+1. 导入仓库，Framework Preset 选 **Other**，Build Command / Output Directory 保持默认。
+2. 在 **Storage** 中创建 **Blob** 商店并连接项目（自动注入 `BLOB_READ_WRITE_TOKEN`），
+   或创建 **Postgres / Neon** 数据库并连接项目（自动注入 `POSTGRES_URL` / `DATABASE_URL`）。
+3. 环境变量（可选但推荐）：
+   - `DB_DRIVER` / `DB_FORMAT`：显式指定驱动与格式（如 `postgres` + `sql`）
+   - `JWT_SECRET`：不设置时安装向导会生成并持久化到已连接的存储
+   - `CRON_SECRET`：Vercel Cron 鉴权（启用定时任务时必填；Vercel 以
+     `Authorization: Bearer <CRON_SECRET>` 发起请求，未设置时该请求会被拒绝）
+
+> Hobby 版 Cron 每天最多触发 1 次，`vercel.json` 已配置 `/api/task/refresh`。
+> Serverless 函数对请求/响应体有上限，代理大文件会自动降级为 302 直链
+> （默认 4 MiB，可用 `RAW_PROXY_MAX_BYTES` 覆盖，`0` 表示不限制）。
+
+#### 命令行部署（CLI）
+
+Git 集成之外也可用 Vercel CLI 发布。有两处与源码约定相关的构建处理必须执行：
+
+```bash
+# 关联项目（首次）
+vercel link --project openlist-tsworker
+
+# 拉取生产环境变量（写入 .vercel/，已被 .gitignore 忽略）
+vercel pull --yes --environment=production
+
+# 平台侧构建，产出 .vercel/output
+vercel build --prod
+
+# 打包并注入函数入口（必需，见下方说明）
+node scripts/vercel-bundle.mjs
+
+# 以预构建产物部署
+vercel deploy --prebuilt --prod
+```
+
+- **函数 entry**：`@vercel/node` 只做逐文件转译、不做打包，而本项目源码使用
+  无扩展名 ESM 相对导入（TS 风格），转译产物在 Node ESM 下无法解析，运行时会
+  报 `ERR_MODULE_NOT_FOUND`。`scripts/vercel-bundle.mjs` 用 esbuild 以 Node 目标
+  把 `api/[...route].ts` 打成自包含 bundle 覆盖函数入口，务必在部署前执行。
+- **根目录 `middleware.js`** 是 EdgeOne Makers 中间件（签名 `middleware(context)`），
+  已由 `.vercelignore` 排除；否则 Vercel 会把它当作 Edge Middleware 匹配全部路由，
+  导致整站 500。
+- **SPA 回退**：`vercel.json` 的负向断言 rewrite 目标为 `/`。在 `cleanUrls` 下
+  `/index.html` 会被 308 到 `/`，若目标写成 `/index.html` 会使深链（如 `/add`）
+  判定落空而 404。
+
 ---
 
 ## 技术架构
@@ -160,13 +211,15 @@ pnpm run deploy:worker
 - `sql`：关系数据库表格式，与 Go 后端完全一致，适用于 D1/MySQL
 
 **DB_DRIVER**（数据库驱动）
-- `auto`（默认）：自动检测可用驱动（优先级：mysql → d1 → kv → cfkv → blob → do）
+- `auto`（默认）：自动检测可用驱动（优先级：postgres → mysql → d1 → kv → cfkv → vblob → blob → do）
 - `blob`：EdgeOne Blob Storage（SDK）/ ESA Blob（binding）
+- `vblob`：Vercel Blob（需配置 `BLOB_READ_WRITE_TOKEN`，连接 Blob 商店后由 Vercel 注入）
 - `cfkv`：Cloudflare KV REST API（需配置 `CF_ACCOUNT`、`CF_KV_UUID`、`CF_API_KEY`）
 - `kv`：KV 存储（binding 名固定为 `KV`；EdgeOne Node 云函数自动走 HTTP 代理模式）
 - `d1`：Cloudflare D1（SQLite）
 - `do`：Cloudflare Durable Objects（SQLite）
 - `mysql`：MySQL（仅 Node.js 容器）
+- `postgres`：Postgres / Neon（Vercel Marketplace Postgres；URL 取自 `POSTGRES_URL` / `DATABASE_URL` 等）
 
 **DB_CIPHER**（敏感字段落盘算法，**默认不加密**）
 - `none`（默认）：不加密，敏感字段与普通 JSON 一样明文落盘
@@ -226,6 +279,15 @@ DB_DRIVER=cfkv
 CF_ACCOUNT=your_account_id
 CF_KV_UUID=your_namespace_id
 CF_API_KEY=your_api_token
+
+# Vercel + Blob（Hobby 免费额度可用）
+DB_FORMAT=map        # 或 key
+DB_DRIVER=vblob      # 连接 Blob 商店后由 Vercel 注入 BLOB_READ_WRITE_TOKEN
+
+# Vercel + Postgres / Neon（推荐：可用 sql 列式表，与 Go 后端共享）
+DB_FORMAT=sql        # 也可用 map / key
+DB_DRIVER=postgres   # 连接 Postgres 后由 Vercel 注入 POSTGRES_URL / DATABASE_URL 等
+CRON_SECRET=<随机串> # 启用 Vercel Cron 时必填：Vercel 以 Authorization: Bearer <CRON_SECRET> 调用 /api/task/refresh
 ```
 
 > 不确定用哪个就保持 `DB_DRIVER=auto`（默认，自动探测）。

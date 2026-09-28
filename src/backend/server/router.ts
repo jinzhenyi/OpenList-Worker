@@ -1,7 +1,11 @@
 import { Hono } from "hono"
 import { cors } from "hono/cors"
 import { getDb, getKvStatus } from "../internal/model/db"
-import { isServerlessRuntime, NO_STORAGE_MESSAGE } from "../internal/model/store/backend"
+import {
+  getStoreStatus,
+  isServerlessRuntime,
+  NO_STORAGE_MESSAGE,
+} from "../internal/model/store/backend"
 import { fsRouter } from "./fs"
 import {
   authRouter,
@@ -34,6 +38,17 @@ function getClientIp(c: any): string {
     c.req.header("x-real-ip") ||
     c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ||
     "unknown"
+  )
+}
+
+// 环境标签：优先显式 ENVIRONMENT，其次平台注入的 VERCEL_ENV / NODE_ENV。
+// Vercel 上 ENVIRONMENT 未设置，若不读 VERCEL_ENV 会把生产部署报成 development。
+function resolveEnvironment(env: any): string {
+  return (
+    env?.ENVIRONMENT ||
+    env?.VERCEL_ENV ||
+    (typeof process !== "undefined" ? process.env?.NODE_ENV : undefined) ||
+    "development"
   )
 }
 
@@ -215,7 +230,7 @@ export function setupRouter(app: Hono) {
       ok: true,
       name: "OpenList",
       version: "v4.2.3",
-      environment: (c.env as any)?.ENVIRONMENT || "development",
+      environment: resolveEnvironment(c.env as any),
     }),
   )
 
@@ -259,6 +274,27 @@ export function setupRouter(app: Hono) {
       }
     }
 
+    // getKvStatus 只认识 KV / Blob 绑定形态。通过 DB_DRIVER 显式配置或 auto
+    // 探测得到的后端（vblob / postgres / d1 / mysql / do）在它眼里仍是 "none"，
+    // 会把「存储其实可用」的部署误报成 unhealthy（Vercel + Blob/Neon 尤其明显）。
+    // 这里用驱动感知的 getStoreStatus 兜底：仅当它确认某个真实驱动已配置时才
+    // 采纳，内存驱动与「无可用驱动」都保持原判定，避免影响本地开发语义。
+    if (!kv?.configured) {
+      try {
+        const store: any = await getStoreStatus(c.env)
+        if (store?.configured && store?.driver && store.driver !== "memory") {
+          kv = {
+            configured: true,
+            connected: store.connected !== false,
+            platform: store.platform || store.driver,
+            error: store.error ?? null,
+          }
+        }
+      } catch {
+        // 状态查询失败：保持 getKvStatus 的结论
+      }
+    }
+
     checks.persistence = {
       configured: !!kv?.configured,
       connected: !!kv?.connected,
@@ -290,7 +326,7 @@ export function setupRouter(app: Hono) {
         ok: healthy,
         name: "OpenList",
         version: "v4.2.3",
-        environment: (c.env as any)?.ENVIRONMENT || "development",
+        environment: resolveEnvironment(c.env as any),
         checks,
       },
       healthy ? 200 : 503,

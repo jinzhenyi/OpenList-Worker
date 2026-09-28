@@ -401,13 +401,17 @@ export function entityToRow(table: DdlTableName, entity: any): {
   return { columns, values }
 }
 
+export type SqlDialect = "sqlite" | "mysql" | "postgres"
+
 /** SQL 列类型 → 方言类型。 */
-function sqlType(col: ColumnDef, dialect: "sqlite" | "mysql"): string {
+function sqlType(col: ColumnDef, dialect: SqlDialect): string {
   switch (col.type) {
     case "number":
-      return dialect === "mysql" ? "BIGINT" : "INTEGER"
+      return dialect === "sqlite" ? "INTEGER" : "BIGINT"
     case "bool":
-      return dialect === "mysql" ? "TINYINT(1)" : "INTEGER"
+      if (dialect === "mysql") return "TINYINT(1)"
+      if (dialect === "postgres") return "BOOLEAN"
+      return "INTEGER"
     case "string":
     case "json":
     case "date":
@@ -417,8 +421,9 @@ function sqlType(col: ColumnDef, dialect: "sqlite" | "mysql"): string {
   }
 }
 
-/** 列标识符统一加反引号（SQLite 与 MySQL 均支持）。 */
-function quote(name: string): string {
+/** 列标识符引用：SQLite/MySQL 用反引号，Postgres 用双引号。 */
+function quote(name: string, dialect: SqlDialect = "sqlite"): string {
+  if (dialect === "postgres") return '"' + name + '"'
   return "`" + name + "`"
 }
 
@@ -427,12 +432,12 @@ function quote(name: string): string {
  */
 function buildTableDdl(
   def: TableDef,
-  dialect: "sqlite" | "mysql",
+  dialect: SqlDialect,
   tableName: string,
 ): string {
   const parts: string[] = []
   for (const col of def.columns) {
-    let line = `${quote(col.name)} ${sqlType(col, dialect)}`
+    let line = `${quote(col.name, dialect)} ${sqlType(col, dialect)}`
     if (col.pk) {
       line += " PRIMARY KEY"
     } else if (!col.nullable) {
@@ -443,23 +448,23 @@ function buildTableDdl(
     }
     parts.push(line)
   }
-  return `CREATE TABLE IF NOT EXISTS ${quote(tableName)} (${parts.join(", ")})`
+  return `CREATE TABLE IF NOT EXISTS ${quote(tableName, dialect)} (${parts.join(", ")})`
 }
 
 /**
  * 生成 schema_info 表（标记 SQL 格式是否已初始化）。
  */
-function buildSchemaInfoDdl(dialect: "sqlite" | "mysql"): string {
-  const k = dialect === "mysql" ? "VARCHAR(255)" : "TEXT"
+function buildSchemaInfoDdl(dialect: SqlDialect): string {
+  const k = dialect === "sqlite" ? "TEXT" : "VARCHAR(255)"
   const v = "TEXT"
-  return `CREATE TABLE IF NOT EXISTS ${quote("schema_info")} (${quote("k")} ${k} PRIMARY KEY, ${quote("v")} ${v})`
+  return `CREATE TABLE IF NOT EXISTS ${quote("schema_info", dialect)} (${quote("k", dialect)} ${k} PRIMARY KEY, ${quote("v", dialect)} ${v})`
 }
 
 /**
  * 生成完整的建表语句数组（幂等）。表名固定为 "x_" 前缀（对齐 Go），
  * 复数表名对齐 Go 的 GORM 命名策略。
  */
-export function buildDdl(dialect: "sqlite" | "mysql", env?: any): string[] {
+export function buildDdl(dialect: SqlDialect, env?: any): string[] {
   const out: string[] = [buildSchemaInfoDdl(dialect)]
   // 建表覆盖全部 DDL 表（含不参与往返的 sshkeys），保证与 Go 共享库时结构一致
   for (const name of DDL_TABLE_NAMES) {
@@ -486,4 +491,8 @@ export const KV_SCHEMA_SQLITE: string[] = [
 
 export const KV_SCHEMA_MYSQL: string[] = [
   "CREATE TABLE IF NOT EXISTS `kv` (`key` VARCHAR(512) PRIMARY KEY, `value` LONGTEXT NOT NULL)",
+]
+
+export const KV_SCHEMA_POSTGRES: string[] = [
+  'CREATE TABLE IF NOT EXISTS "kv" ("key" VARCHAR(512) PRIMARY KEY, "value" TEXT NOT NULL)',
 ]

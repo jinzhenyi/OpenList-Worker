@@ -36,6 +36,9 @@ public_data
 wrangler.d1.toml
 wrangler.local.jsonc
 
+# vercel local project link (may contain org/project ids; never commit)
+.vercel
+
 # OS files
 Thumbs.db
 desktop.ini
@@ -92,3 +95,4 @@ docs/code-review-*.md
 wrangler.d1.jsonc
 .wrangler-dryrun/
 .tmp-dryrun/
+.env*

@@ -21,7 +21,16 @@ export type StorageFormat = "map" | "key" | "sql"
 export type EnvContext = Record<string, any>
 
 /** 存储驱动类型 */
-export type StorageDriver = "auto" | "blob" | "cfkv" | "kv" | "d1" | "do" | "mysql"
+export type StorageDriver =
+  | "auto"
+  | "blob"
+  | "vblob"
+  | "cfkv"
+  | "kv"
+  | "d1"
+  | "do"
+  | "mysql"
+  | "postgres"
 
 /**
  * 驱动接口（底层 I/O）

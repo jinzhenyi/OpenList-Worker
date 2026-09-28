@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import { test } from "node:test"
 import type { Driver } from "./types"
-import { readDriver, readFormat, getStoreBackend } from "./backend"
+import { readDriver, readFormat, getStoreBackend, isServerlessRuntime } from "./backend"
 import { readPersistedSecret, writePersistedSecret } from "./json"
 import { mapFormat } from "./format/map"
 import { keyFormat } from "./format/key"
@@ -17,6 +17,8 @@ import {
   tableSqlName,
   D1_SCHEMA,
   MYSQL_SCHEMA,
+  buildDdl,
+  KV_SCHEMA_POSTGRES,
   serializeColumn,
   deserializeColumn,
   rowToEntity,
@@ -113,6 +115,15 @@ function createMockSqlDriver(name = "mock-sql"): Driver {
         if (
           /^INSERT INTO `?schema_info`?/i.test(trimmed) &&
           /ON DUPLICATE KEY UPDATE/i.test(trimmed)
+        ) {
+          schemaInfo.set(String(params[0]), String(params[1]))
+          continue
+        }
+        // Postgres 方言：INSERT INTO `schema_info` (...) VALUES (...) ON CONFLICT (...) DO UPDATE ...
+        // （sqlFormat 生成反引号，真实 postgres 驱动在 batch 时转双引号；mock 两种都收）
+        if (
+          /^INSERT INTO [`"]?schema_info[`"]?/i.test(trimmed) &&
+          /ON CONFLICT/i.test(trimmed)
         ) {
           schemaInfo.set(String(params[0]), String(params[1]))
           continue
@@ -235,6 +246,8 @@ test("backend factory: readDriver/readFormat backward compat", () => {
   assert.equal(readDriver({ DB_DRIVER: "d1" }), "d1")
   assert.equal(readDriver({ DB_DRIVER: "MYSQL" }), "mysql")
   assert.equal(readDriver({ DB_DRIVER: "cfkv" }), "cfkv")
+  assert.equal(readDriver({ DB_DRIVER: "VBLOB" }), "vblob")
+  assert.equal(readDriver({ DB_DRIVER: "postgres" }), "postgres")
   // DB_DRIVER=json → auto（旧整对象语义）
   assert.equal(readDriver({ DB_DRIVER: "json" }), "auto")
 
@@ -247,6 +260,11 @@ test("backend factory: readDriver/readFormat backward compat", () => {
 test("backend factory: auto detection falls back to memory", async () => {
   const b = await getStoreBackend({})
   assert.equal(b.name, "memory")
+})
+
+test("backend factory: isServerlessRuntime 识别 Vercel", () => {
+  assert.equal(isServerlessRuntime({ VERCEL: "1" }), true)
+  assert.equal(isServerlessRuntime({ VERCEL_ENV: "production" }), true)
 })
 
 test("map format: roundtrip via mock KV driver", async () => {
@@ -273,6 +291,30 @@ test("sql format: MySQL dialect uses ON DUPLICATE KEY UPDATE (no INSERT OR REPLA
   const driver = createMockSqlDriver("mysql")
   assert.equal(await sqlFormat.save(SAMPLE_DB, driver), true)
   assert.deepEqual(await sqlFormat.load(driver), SAMPLE_DB)
+})
+
+test("sql format: Postgres dialect uses ON CONFLICT DO UPDATE (roundtrip)", async () => {
+  // 回归防护：Postgres 不支持 INSERT OR REPLACE / ON DUPLICATE KEY，
+  // 若 postgres 方言分支失效，mock 驱动会因语句无法匹配而抛错。
+  const driver = createMockSqlDriver("postgres")
+  assert.equal(await sqlFormat.save(SAMPLE_DB, driver), true)
+  assert.deepEqual(await sqlFormat.load(driver), SAMPLE_DB)
+})
+
+test("schema: Postgres dialect DDL uses double quotes and dialect types", () => {
+  const pg = buildDdl("postgres", {})
+  // 与其它方言生成的表数量一致（schema_info + 7 张业务表）
+  assert.equal(pg.length, D1_SCHEMA.length)
+  assert.ok(pg.some((d) => d.includes('"x_setting_items"')))
+  // Postgres 标识符必须用双引号，不能残留反引号
+  assert.ok(pg.every((d) => !d.includes("`")), "Postgres DDL 不应包含反引号")
+  // 方言类型：bool → BOOLEAN，number → BIGINT
+  assert.ok(pg.some((d) => /"disabled" BOOLEAN/.test(d)))
+  assert.ok(pg.some((d) => /"id" BIGINT/.test(d)))
+  assert.ok(KV_SCHEMA_POSTGRES.every((d) => !d.includes("`")))
+  // 回归：quote 的方言分支不得影响 sqlite / mysql（仍用反引号）
+  assert.ok(D1_SCHEMA.some((d) => d.includes("`x_setting_items`")))
+  assert.ok(MYSQL_SCHEMA.some((d) => d.includes("`x_setting_items`")))
 })
 
 /**

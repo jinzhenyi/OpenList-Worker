@@ -78,7 +78,26 @@ app.use("*", async (c, next) => {
   // EdgeOne 场景：KV 只能由 Edge Function 访问，Node 云函数需经 HTTP 代理
   // 调用 /kv-* 。而 Node 的 fetch 不接受相对 URL，因此这里把当前请求的
   // origin 注入 env，供 kv 驱动拼出绝对地址（同一部署内自调用）。
-  const env = (c.env || {}) as any
+  // Vercel / Node 容器把配置放在 process.env，Hono 的 c.env 默认是空对象。
+  // 不合并则 JWT_SECRET、BLOB_READ_WRITE_TOKEN、POSTGRES_URL 全部丢失。
+  // 就地合并（而非新建对象）以保持 c.env 的对象身份：getStorageBackend 按
+  // env 身份缓存解析结果，若每请求都新建对象，CF/EdgeOne 上会持续缓存失效。
+  // c.env 中已有的请求级字段（binding）优先，不被同名 process.env 覆盖。
+  const procEnv =
+    typeof process !== "undefined" ? (process as any).env || {} : {}
+  let env = ((c.env || {}) as any)
+  try {
+    if (env && typeof env === "object") {
+      for (const key of Object.keys(procEnv)) {
+        if (env[key] === undefined) env[key] = procEnv[key]
+      }
+    } else {
+      env = { ...procEnv }
+    }
+  } catch {
+    // 冻结对象等异常：退化为按请求新建（仅影响缓存命中，不影响正确性）
+    env = { ...procEnv, ...((c.env || {}) as any) }
+  }
   try {
     const reqUrl = new URL(c.req.url)
     if (!env.__requestOrigin) {
@@ -89,6 +108,8 @@ app.use("*", async (c, next) => {
   }
 
   setEnvCtx(env)
+  // 写回 c.env，后续 handler 读 c.env 也能拿到合并后的变量
+  ;(c as any).env = env
 
   // 存储配置错误全局拦截：任何依赖持久化的 API 都应立即得到明确错误，
   // 而不是静默退回内存模式（表现为「操作成功但数据丢失」）。

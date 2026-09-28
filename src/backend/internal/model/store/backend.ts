@@ -2,7 +2,7 @@
  * 持久化后端工厂：按 DB_DRIVER 和 DB_FORMAT 环境变量选择驱动和格式。
  *
  * 新架构（驱动层 + 格式层分离）：
- * - DB_DRIVER: 底层存储驱动（auto/blob/cfkv/kv/d1/do/mysql）
+ * - DB_DRIVER: 底层存储驱动（auto/blob/vblob/cfkv/kv/d1/do/mysql/postgres）
  * - DB_FORMAT: 数据存储格式（map/key/sql）
  *
  * 向后兼容（旧配置自动映射）：
@@ -16,11 +16,13 @@ import type {
   StoreBackend,
 } from "./types"
 import { blobDriver } from "./driver/blob"
+import { vblobDriver } from "./driver/vblob"
 import { cfkvDriver } from "./driver/cfkv"
 import { checkProxyConfig, kvDriver } from "./driver/kv"
 import { d1Driver } from "./driver/d1"
 import { doDriver } from "./driver/do"
 import { mysqlDriver } from "./driver/mysql"
+import { hasPostgresConfig, postgresDriver } from "./driver/postgres"
 import { memoryDriver } from "./driver/memory"
 import { mapFormat } from "./format/map"
 import { keyFormat } from "./format/key"
@@ -126,20 +128,36 @@ export function readCipher(env?: any): DbCipher {
  * 是否处于 Serverless / Worker 类运行环境。
  *
  * 判定目的：这些环境（Cloudflare Workers、EdgeOne Edge/Node 云函数、
- * 阿里云 ESA 函数等）多实例、随时冷启，**内存存储完全无法持久化**，
- * 且会给出「写入成功」的假象。因此在此类环境中永不使用内存后端。
+ * 阿里云 ESA 函数、Vercel Serverless 等）多实例、随时冷启，**内存存储
+ * 完全无法持久化**，且会给出「写入成功」的假象。因此在此类环境中永不
+ * 使用内存后端。
  *
  * 判定依据全部为运行时特征（不依赖用户配置），命中任一即成立：
  *  1. EdgeOne：请求上下文标记、KV/Blob 相关绑定、EdgeOne 专属全局变量
  *  2. Cloudflare Workers：WebSocketPair / caches.default / CF 绑定
  *  3. 阿里云 ESA：ESA 全局对象与绑定
- *  4. 通用：注入型请求上下文（__requestOrigin / __requestContext）
+ *  4. Vercel：VERCEL / VERCEL_ENV（平台注入，Hobby/Pro 均有）
+ *  5. 通用：注入型请求上下文（__requestOrigin / __requestContext）
  */
 export function isServerlessRuntime(env?: any): boolean {
   const g = globalThis as any
+  const proc =
+    typeof process !== "undefined" ? process.env || {} : {}
   try {
     // ── 通用：请求上下文由平台注入 ──
     if (env?.__requestOrigin || env?.__requestContext || env?.__makersContext) {
+      return true
+    }
+
+    // ── Vercel Serverless / Edge ──
+    // 平台在所有部署（Hobby 与 Pro）注入 VERCEL=1 与 VERCEL_ENV。
+    // 本地 `vercel dev` 同样注入，必须按 serverless 处理，禁止回退内存。
+    if (
+      env?.VERCEL ||
+      env?.VERCEL_ENV ||
+      proc.VERCEL ||
+      proc.VERCEL_ENV
+    ) {
       return true
     }
 
@@ -171,7 +189,7 @@ export function isServerlessRuntime(env?: any): boolean {
     // 平台会注入 SCF 相关变量，可据此识别（固定变量名，平台自动注入）
     if (
       env?.TENCENTCLOUD_SCF_FUNCTIONNAME ||
-      (typeof process !== "undefined" && process.env?.TENCENTCLOUD_SCF_FUNCTIONNAME)
+      proc.TENCENTCLOUD_SCF_FUNCTIONNAME
     ) {
       return true
     }
@@ -182,9 +200,11 @@ export function isServerlessRuntime(env?: any): boolean {
 }
 
 /**
- * 自动检测可用的驱动（优先级：mysql → d1 → kv → cfkv → blob → do）。
+ * 自动检测可用的驱动（优先级：postgres → mysql → d1 → kv → cfkv → vblob → blob → do）。
  *
- * mysql 仅在显式配置连接信息时参与探测（详见 hasMysqlConfig）。
+ * mysql / postgres 仅在显式配置连接信息时参与探测（详见 hasMysqlConfig /
+ * hasPostgresConfig）。Vercel Hobby 上优先探测 Marketplace Postgres 与
+ * Vercel Blob。
  *
  * 若全部不可用：
  *  - 本地/容器环境：回退内存（便于开发调试）
@@ -192,16 +212,26 @@ export function isServerlessRuntime(env?: any): boolean {
  *    避免「操作成功但数据丢失」的假象
  */
 async function autoDetectDriver(env?: any): Promise<Driver> {
-  // 检测顺序：mysql → d1 → kv → cfkv → blob → do
+  // 检测顺序：postgres → mysql → d1 → kv → cfkv → vblob → blob → do
   //
-  // - mysql 需要网络连接，只有显式配置了连接信息才尝试，否则每次 auto 探测
-  //   都会先尝试建 TCP 连接（失败后继续），在 CF/EO 等边缘环境上纯属浪费。
+  // - postgres / mysql 需要网络连接，只有显式配置了连接信息才尝试，否则每次
+  //   auto 探测都会先尝试建连（失败后继续），在 CF/EO 等边缘环境上纯属浪费。
   // - kv 与 cfkv 同为 KV 语义：优先本地 binding（更直接、更快），
   //   其次才走 Cloudflare REST API。
+  // - vblob 在 blob（EdgeOne/ESA）之前：Vercel 上只有 Blob token，
+  //   EdgeOne SDK 探测会失败，顺序不影响其它平台。
   const candidates: Driver[] = []
 
+  if (hasPostgresConfig(env)) candidates.push(postgresDriver)
   if (hasMysqlConfig(env)) candidates.push(mysqlDriver)
-  candidates.push(d1Driver, kvDriver, cfkvDriver, blobDriver, doDriver)
+  candidates.push(
+    d1Driver,
+    kvDriver,
+    cfkvDriver,
+    vblobDriver,
+    blobDriver,
+    doDriver,
+  )
 
   for (const driver of candidates) {
     if (await driver.isAvailable(env)) {
@@ -265,18 +295,30 @@ function hasMysqlConfig(env?: any): boolean {
  */
 function noStorageHint(env?: any): string {
   const g = globalThis as any
+  const proc =
+    typeof process !== "undefined" ? process.env || {} : {}
+  const isVercel = Boolean(
+    env?.VERCEL || env?.VERCEL_ENV || proc.VERCEL || proc.VERCEL_ENV,
+  )
   const isEdgeOne =
     Boolean(env?.EDGEONE_BLOB || g?.EDGEONE_BLOB) ||
     typeof g?.EdgeOne !== "undefined" ||
     Boolean(
       env?.TENCENTCLOUD_SCF_FUNCTIONNAME ||
-        (typeof process !== "undefined" &&
-          process.env?.TENCENTCLOUD_SCF_FUNCTIONNAME),
+        proc.TENCENTCLOUD_SCF_FUNCTIONNAME,
     )
   const isEsa = Boolean(env?.ESA_BLOB || g?.ESA_BLOB) || typeof g?.ESA !== "undefined"
-  // 无 CF 专属绑定特征时才可能是 CF；ESA/EdgeOne 已在上方排除
-  const isCloudflare = !isEdgeOne && !isEsa
+  // 无 CF 专属绑定特征时才可能是 CF；ESA/EdgeOne/Vercel 已在上方排除
+  const isCloudflare = !isEdgeOne && !isEsa && !isVercel
 
+  if (isVercel) {
+    return (
+      "DB_DRIVER=auto already probed every driver. On Vercel Hobby, connect " +
+      "Vercel Blob (BLOB_READ_WRITE_TOKEN, DB_DRIVER=vblob, DB_FORMAT=map) " +
+      "or Marketplace Postgres/Neon (POSTGRES_URL, DB_DRIVER=postgres, " +
+      "DB_FORMAT=sql), then redeploy."
+    )
+  }
   if (isEdgeOne) {
     return (
       "DB_DRIVER=auto already probed every driver. On EdgeOne, bind a Blob " +
@@ -300,7 +342,8 @@ function noStorageHint(env?: any): string {
   }
   return (
     "DB_DRIVER=auto already probed every driver. Bind a persistent backend " +
-    "(Cloudflare: D1/KV; EdgeOne: Blob; ESA: ESA_BLOB), then redeploy."
+    "(Vercel: Blob/Postgres; Cloudflare: D1/KV; EdgeOne: Blob; ESA: ESA_BLOB), " +
+    "then redeploy."
   )
 }
 
@@ -317,8 +360,10 @@ export const NO_STORAGE_MESSAGE =
   "  2. EdgeOne KV: bind a KV namespace to Edge Functions, then set " +
   "DB_DRIVER=kv (DB_FORMAT=map or key) and JWT_SECRET\n" +
   "  3. Cloudflare KV / D1: bind the namespace and set DB_DRIVER accordingly\n" +
+  "  4. Vercel Blob: set BLOB_READ_WRITE_TOKEN and DB_DRIVER=vblob\n" +
+  "  5. Vercel Postgres / Neon: set POSTGRES_URL and DB_DRIVER=postgres\n" +
   "Environment variables to set in the project settings:\n" +
-  "  DB_DRIVER=blob | kv | cfkv | d1 | do | mysql\n" +
+  "  DB_DRIVER=blob | vblob | kv | cfkv | d1 | do | mysql | postgres\n" +
   "  DB_FORMAT=map | key | sql"
 
 /**
@@ -335,16 +380,18 @@ export const NO_STORAGE_MESSAGE =
 export const MEMORY_SERVERLESS_MESSAGE =
   'DB_DRIVER="memory" is only valid on a local Node runtime.\n' +
   "This deployment is serverless, where in-memory storage loses all data immediately.\n" +
-  "Set DB_DRIVER=auto, or bind a persistent backend (D1 / KV / Blob)."
+  "Set DB_DRIVER=auto, or bind a persistent backend (D1 / KV / Blob / Postgres)."
 
 /** 驱动名 → 实现（memory 不在此表中，由 resolveDriver 单独处理，见下） */
 const DRIVER_MAP: Record<string, Driver> = {
   blob: blobDriver,
+  vblob: vblobDriver,
   cfkv: cfkvDriver,
   kv: kvDriver,
   d1: d1Driver,
   do: doDriver,
   mysql: mysqlDriver,
+  postgres: postgresDriver,
 }
 
 /**
@@ -433,9 +480,16 @@ const DRIVER_UNAVAILABLE_HINTS: Record<string, string> = {
     "The \"mysql\" driver requires a Node runtime plus connection info " +
     "(MYSQL_URLS, or MYSQL_HOST/MYSQL_PORT/MYSQL_USER/MYSQL_PASS/MYSQL_NAME). " +
     "Cloudflare Workers cannot open raw TCP connections to MySQL.\n",
+  postgres:
+    "The \"postgres\" driver requires a connection URL " +
+    "(POSTGRES_URL, DATABASE_URL, or NEON_DATABASE_URL). On Vercel Hobby, " +
+    "connect Marketplace Postgres or Neon so POSTGRES_URL is injected.\n",
   blob:
     "The \"blob\" driver requires either the EdgeOne Blob SDK (only present " +
     "inside the EdgeOne Makers runtime) or an ESA_BLOB binding on Alibaba ESA.\n",
+  vblob:
+    "The \"vblob\" driver requires BLOB_READ_WRITE_TOKEN (injected after " +
+    "connecting a Vercel Blob store). Set DB_FORMAT=map (or key).\n",
 }
 
 /**
@@ -507,12 +561,15 @@ function autoPickHint(driver: Driver | null): string {
 const DRIVER_FORMAT_WHITELIST: Record<string, StorageFormat[]> = {
   // blob：单文档存储，只支持整存整取的 map
   blob: ["map"],
+  // vblob：Vercel Blob 支持按 pathname 读写，map 与 key 均可
+  vblob: ["map", "key"],
   // 显式列出其余驱动，避免新增驱动时「忘了加白名单 = 全放行」的静默风险。
   kv: ["map", "key"],
   cfkv: ["map", "key"],
   d1: ["map", "key", "sql"],
   do: ["map", "key", "sql"],
   mysql: ["map", "key", "sql"],
+  postgres: ["map", "key", "sql"],
   memory: ["map", "key"],
 }
 
@@ -546,16 +603,16 @@ function validateDriverFormat(driver: Driver, format: FormatAdapter): void {
       `Driver "${driver.name}" supports: ${supported || "no format"}.\n` +
       (format.name === "sql"
         ? "The \"sql\" format needs a relational driver (SQL query support): " +
-          "d1 | do | mysql.\n"
+          "d1 | do | mysql | postgres.\n"
         : `The "${format.name}" format needs a key-value driver ` +
-          "(get/put/delete/list): kv | cfkv | d1 | do | mysql.\n") +
+          "(get/put/delete/list): kv | cfkv | d1 | do | mysql | postgres | vblob.\n") +
       `Fix DB_FORMAT or DB_DRIVER. See ${STORAGE_DOC}`,
     // 非法组合通常只差一个变量，直接给出「改成什么」。
     // 优先建议改 DB_FORMAT（保持用户已选定的驱动），因为驱动往往是被平台
     // 唯一支持的（如 ESA 上只有 blob），而格式才是用户可自由选择的维度。
     format.name === "sql"
       ? `Set DB_FORMAT=map (or key), or switch to a relational driver ` +
-        `(DB_DRIVER=d1 | do | mysql).`
+        `(DB_DRIVER=d1 | do | mysql | postgres).`
       : `Set DB_FORMAT=map for DB_DRIVER="${driver.name}"` +
         (supported.includes("|") ? `, or one of: ${supported}.` : `.`),
   )

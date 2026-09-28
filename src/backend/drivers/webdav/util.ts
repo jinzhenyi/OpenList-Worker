@@ -541,10 +541,15 @@ export class WebdavClient {
     }
 
     if (resp.status !== 207 && !resp.ok) {
-      const errText = await resp.text()
-      throw new Error(
-        `WebDAV PROPFIND failed with status ${resp.status}: ${errText || resp.statusText}`,
+      // 远端响应体可能是 Cloudflare 挑战页等大段 HTML，含 URL/路径与扩展名，
+      // 一旦拼进对外错误信息就会被 safeErrorMessage 整体脱敏成
+      // "Internal server error"，让用户完全看不到真正原因（如 403 挑战）。
+      // 因此只把响应体写入日志，对外仅保留状态码。
+      const errText = await resp.text().catch(() => "")
+      console.warn(
+        `[webdav] PROPFIND ${remotePath} failed: status=${resp.status} body=${errText.slice(0, 500)}`,
       )
+      throw new Error(`WebDAV PROPFIND failed with status ${resp.status}`)
     }
 
     const xml = await resp.text()
@@ -582,10 +587,15 @@ export class WebdavClient {
     }
 
     if (resp.status !== 207 && !resp.ok) {
-      const errText = await resp.text()
-      throw new Error(
-        `WebDAV PROPFIND failed with status ${resp.status}: ${errText || resp.statusText}`,
+      // 远端响应体可能是 Cloudflare 挑战页等大段 HTML，含 URL/路径与扩展名，
+      // 一旦拼进对外错误信息就会被 safeErrorMessage 整体脱敏成
+      // "Internal server error"，让用户完全看不到真正原因（如 403 挑战）。
+      // 因此只把响应体写入日志，对外仅保留状态码。
+      const errText = await resp.text().catch(() => "")
+      console.warn(
+        `[webdav] PROPFIND ${remotePath} failed: status=${resp.status} body=${errText.slice(0, 500)}`,
       )
+      throw new Error(`WebDAV PROPFIND failed with status ${resp.status}`)
     }
 
     const xml = await resp.text()

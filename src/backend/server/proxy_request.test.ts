@@ -12,6 +12,7 @@ import {
   rawUrlNeedsPrivateHeaders,
   upstreamBodySize,
   DEFAULT_EDGEONE_PAYLOAD_LIMIT,
+  DEFAULT_VERCEL_PAYLOAD_LIMIT,
   PROXY_USER_AGENT,
   type UpstreamResponseLike,
 } from "./proxy_request"
@@ -367,6 +368,25 @@ test("getProxyPayloadLimit: 应用自注入的 __requestOrigin 不构成 EdgeOne
       env: { __requestOrigin: "https://x.edgeone.cool" },
     }),
     0,
+  )
+})
+
+test("getProxyPayloadLimit: Vercel 运行时默认 4 MiB", () => {
+  assert.equal(DEFAULT_VERCEL_PAYLOAD_LIMIT, 4 * MiB)
+  assert.equal(
+    getProxyPayloadLimit({ env: { VERCEL: "1" } }),
+    DEFAULT_VERCEL_PAYLOAD_LIMIT,
+  )
+  assert.equal(
+    getProxyPayloadLimit({ env: { VERCEL_ENV: "production" } }),
+    DEFAULT_VERCEL_PAYLOAD_LIMIT,
+  )
+  // RAW_PROXY_MAX_BYTES 优先于平台默认
+  assert.equal(
+    getProxyPayloadLimit({
+      env: { VERCEL: "1", RAW_PROXY_MAX_BYTES: "1048576" },
+    }),
+    1048576,
   )
 })
 

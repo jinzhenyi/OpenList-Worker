@@ -147,12 +147,15 @@ export function sanitizeContentDisposition(value: string): string {
 //   - 超限 + 无法降级为直链         → 返回可读的 413，而不是平台错误页
 //
 // 环境变量：
-//   RAW_PROXY_MAX_BYTES  平台单次请求/响应上限（字节）。缺省时在 EdgeOne 运行时
-//                        自动取 6 MiB；其他平台视为不限制；显式设为 0 关闭限制
-//                        （自托管场景可据此恢复「永远代理」）。
+//   RAW_PROXY_MAX_BYTES  平台单次请求/响应上限（字节）。缺省时 EdgeOne 取
+//                        6 MiB、Vercel 取 4 MiB；其他平台视为不限制；显式
+//                        设为 0 关闭限制（自托管场景可据此恢复「永远代理」）。
 
 /** EdgeOne 云函数对单次请求/响应 body 的硬上限 */
 export const DEFAULT_EDGEONE_PAYLOAD_LIMIT = 6 * 1024 * 1024
+
+/** Vercel Serverless 响应体上限（Hobby 约 4.5 MiB，取 4 MiB 留余量） */
+export const DEFAULT_VERCEL_PAYLOAD_LIMIT = 4 * 1024 * 1024
 
 /** 原生代理前的上限判断结果 */
 export type ProxyPayloadAction = "proxy" | "redirect" | "too-large"
@@ -200,6 +203,13 @@ function isEdgeOneRuntime(c: any): boolean {
   )
 }
 
+function isVercelRuntime(c: any): boolean {
+  const env = c?.env || {}
+  const procEnv: any =
+    typeof process !== "undefined" ? (process as any).env || {} : {}
+  return Boolean(env.VERCEL || env.VERCEL_ENV || procEnv.VERCEL || procEnv.VERCEL_ENV)
+}
+
 /** 平台单次请求/响应 body 上限（字节）；0 表示不限制 */
 export function getProxyPayloadLimit(c: any): number {
   const raw = readEnvValue(c, "RAW_PROXY_MAX_BYTES").trim()
@@ -207,7 +217,9 @@ export function getProxyPayloadLimit(c: any): number {
     const parsed = parseInt(raw, 10)
     if (Number.isFinite(parsed) && parsed >= 0) return parsed
   }
-  return isEdgeOneRuntime(c) ? DEFAULT_EDGEONE_PAYLOAD_LIMIT : 0
+  if (isEdgeOneRuntime(c)) return DEFAULT_EDGEONE_PAYLOAD_LIMIT
+  if (isVercelRuntime(c)) return DEFAULT_VERCEL_PAYLOAD_LIMIT
+  return 0
 }
 
 /**

@@ -25,11 +25,12 @@ function quote(name: string): string {
 /**
  * 生成 UPSERT 语句。
  *
- * SQLite（D1 / DO）与 MySQL 语法不同，必须按方言分支：
+ * SQLite（D1 / DO）、MySQL、Postgres 语法不同，必须按方言分支：
  *   - SQLite: INSERT OR REPLACE INTO ...
  *   - MySQL:  INSERT INTO ... ON DUPLICATE KEY UPDATE ...
+ *   - Postgres: INSERT INTO ... ON CONFLICT (pk) DO UPDATE SET ...
  *
- * 驱动名即方言标识：d1 / do 为 SQLite，mysql 为 MySQL。
+ * 驱动名即方言标识：d1 / do 为 SQLite，mysql 为 MySQL，postgres 为 Postgres。
  */
 function upsertSql(
   table: string,
@@ -50,6 +51,18 @@ function upsertSql(
     const sql = updates
       ? `INSERT INTO ${table} (${cols}) VALUES (${placeholders}) ON DUPLICATE KEY UPDATE ${updates}`
       : `INSERT INTO ${table} (${cols}) VALUES (${placeholders})`
+    return { sql, params }
+  }
+
+  if (driver.name === "postgres") {
+    const pk = quote(columns[0])
+    const updates = columns
+      .slice(1)
+      .map((c) => `${quote(c)} = EXCLUDED.${quote(c)}`)
+      .join(", ")
+    const sql = updates
+      ? `INSERT INTO ${table} (${cols}) VALUES (${placeholders}) ON CONFLICT (${pk}) DO UPDATE SET ${updates}`
+      : `INSERT INTO ${table} (${cols}) VALUES (${placeholders}) ON CONFLICT (${pk}) DO NOTHING`
     return { sql, params }
   }
 

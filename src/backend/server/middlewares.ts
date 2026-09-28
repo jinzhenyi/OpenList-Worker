@@ -297,17 +297,28 @@ function timingSafeEqual(a: string, b: string): boolean {
 }
 
 /**
- * 定时调度鉴权通道：EdgeOne Schedules 只能携带 path/method/payload，
- * 无法附加 Authorization 头。复用 JWT_SECRET 作为调度密钥，
- * 允许请求通过 query（?cron_secret=）、JSON body { cron_secret }
- * 或 X-Cron-Secret 头携带匹配值触发受保护的任务接口。
+ * 定时调度鉴权通道：EdgeOne Schedules / Vercel Cron 只能携带
+ * path/method/payload，无法附加 Authorization 头。复用 JWT_SECRET
+ * 作为调度密钥，允许请求通过 query（?cron_secret=）、JSON body
+ * { cron_secret } 或 X-Cron-Secret 头携带匹配值触发受保护的任务接口。
+ *
+ * Vercel Cron 另外注入 Authorization: Bearer <CRON_SECRET>。
+ * 未单独配置 CRON_SECRET 时回退 JWT_SECRET，Hobby 只需填一个密钥。
  */
 export async function matchCronSecret(c: Context): Promise<boolean> {
   const env = (c as any)?.env || {}
+  const proc =
+    typeof process !== "undefined" ? process.env || {} : {}
   const secret =
-    env.JWT_SECRET ||
-    (typeof process !== "undefined" ? process.env?.JWT_SECRET : "")
+    env.JWT_SECRET || proc.JWT_SECRET
   if (!secret || typeof secret !== "string") return false
+
+  const cronSecret = env.CRON_SECRET || proc.CRON_SECRET || secret
+  const auth = c.req.header("authorization") || ""
+  if (auth.toLowerCase().startsWith("bearer ")) {
+    const token = auth.slice(7).trim()
+    if (token && timingSafeEqual(token, cronSecret)) return true
+  }
 
   const header = c.req.header("x-cron-secret")
   if (header && timingSafeEqual(header, secret)) return true
