@@ -8,11 +8,14 @@
  *   1. FRONTEND_DIST 环境变量：已构建好的 dist 目录路径（最快，CI 缓存场景）
  *   2. FRONTEND_REPO 环境变量：本地官方前端仓库路径（自动 install + build）
  *   3. 同级目录 ../Storlane-Frontend（monorepo 布局，自动探测，自动 install + build）
- *   4. 默认：下载 npm 上【已发布】的 dist（版本取 registry 的 latest，
- *      可用 FRONTEND_VERSION 固定）
- *   5. FRONTEND_BUILD_FROM_SOURCE=1：从 Git 克隆前端 main 分支并现构建
+ *   4. 默认：先尝试下载 npm 上【已发布】的 dist（版本取 registry 的 latest，
+ *      可用 FRONTEND_VERSION 固定）；未发布时自动回退到 5
+ *   5. 从 Git 克隆前端（Storlane-Frontend fork）main 分支并现构建；
+ *      FRONTEND_BUILD_FROM_SOURCE=1 可强制走此路径
  *
- * 为什么默认取「已发布 dist」而不是「克隆 main 现构建」：
+ * 说明：本 fork 未发布到 npm，默认路径实际会回退到从 fork 现构建。
+ *
+ * 已发布 dist 优先的原因（若未来发布 npm 包仍适用）：
  *   前端产物是内容哈希文件名（/assets/index-XXXX.js），而 CDN（jsdelivr /
  *   unpkg / npmmirror）提供的正是 npm 包里那一份 dist。若本地从 main 现构建，
  *   哈希与 CDN 上的不一致，ASSET_URLS 的「路径 A」（下发本地 index.html +
@@ -272,15 +275,22 @@ async function main() {
     return
   }
 
-  // 4. 下载 npm 上已发布的 dist（默认）
+  // 4. 下载 npm 上已发布的 dist（默认优先）
   //    从 main 现构建的产物哈希与 CDN 不一致，会让路径 A 失效、npmmirror 之类的
-  //    镜像完全不可用（详见文件头），故默认改为取已发布产物。
+  //    镜像完全不可用（详见文件头），故优先取已发布产物。
+  //    本 fork 未发布到 npm（404 / 无 dist-tags）时自动回退到 5 从 Git 现构建。
   if (process.env.FRONTEND_BUILD_FROM_SOURCE !== "1") {
-    await fetchPublishedDist()
-    return
+    try {
+      await fetchPublishedDist()
+      return
+    } catch (err) {
+      console.warn(
+        `  published dist unavailable (${err?.message || err}); falling back to source build`,
+      )
+    }
   }
 
-  // 5. 从 Git 克隆 main 并构建（FRONTEND_BUILD_FROM_SOURCE=1 时使用）
+  // 5. 从 Git 克隆 main 并构建（未发布 npm 包时的默认路径，或 FRONTEND_BUILD_FROM_SOURCE=1 强制）
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "storlane-frontend-"))
   console.log(`  Cloning official frontend: ${OFFICIAL_REPO_URL}#${OFFICIAL_REPO_REF}`)
   try {

@@ -360,8 +360,10 @@ publicRouter.get("/settings", async (c) => {
     robots_txt: "User-agent: *\nAllow: /",
 
     // --- Appearance ---
-    logo: "https://res.oplist.org/logo/logo.svg",
-    favicon: "https://res.oplist.org/logo/logo.svg",
+    logo:
+      "https://raw.githubusercontent.com/jinzhenyi/Storlane-Frontend/main/public/logo.svg",
+    favicon:
+      "https://raw.githubusercontent.com/jinzhenyi/Storlane-Frontend/main/public/logo.svg",
     main_color: "#1890ff",
     hide_storage_details: "false",
     hide_storage_details_in_manage_page: "false",
