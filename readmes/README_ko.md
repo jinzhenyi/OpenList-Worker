@@ -1,15 +1,15 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/OpenListTeam/Logo/main/logo.svg" width="128" height="128" alt="logo" />
+  <img src="https://raw.githubusercontent.com/StorlaneTeam/Logo/main/logo.svg" width="128" height="128" alt="logo" />
 
-  <p><em>OpenList는 다양한 기능을 갖춘 디렉터리 목록 도구로, 수십 가지 클라우드 드라이브 마운트와 파일 미리보기/다운로드/공유 등을 지원합니다</em></p>
-  <p>이 저장소는 공식 <a href="https://github.com/OpenListTeam/OpenList">OpenListTeam/OpenList</a> 프로젝트의 TypeScript + Serverless 아키텍처 포팅 버전입니다</p>
+  <p><em>Storlane는 다양한 기능을 갖춘 디렉터리 목록 도구로, 수십 가지 클라우드 드라이브 마운트와 파일 미리보기/다운로드/공유 등을 지원합니다</em></p>
+  <p>이 저장소는 공식 <a href="https://github.com/jinzhenyi/Storlane">jinzhenyi/Storlane</a> 프로젝트의 TypeScript + Serverless 아키텍처 포팅 버전입니다</p>
   <p>Cloudflare Workers / EdgeOne Cloud Function / Alibaba Cloud ESA에서 실행됩니다</p>
 
-<a href="https://github.com/OpenListTeam/OpenList-Worker/blob/main/LICENSE"><img src="https://img.shields.io/github/license/OpenListTeam/OpenList-Worker" alt="License" /></a>
-<a href="https://github.com/OpenListTeam/OpenList-Worker/actions/workflows/edgeone-artifact-guard.yml"><img src="https://img.shields.io/github/actions/workflow/status/OpenListTeam/OpenList-Worker/edgeone-artifact-guard.yml?branch=main" alt="Build status" /></a>
-<a href="https://github.com/OpenListTeam/OpenList-Worker/releases"><img src="https://img.shields.io/github/release/OpenListTeam/OpenList-Worker" alt="latest version" /></a>
-<a href="https://github.com/OpenListTeam/OpenList-Worker/discussions"><img src="https://img.shields.io/github/discussions/OpenListTeam/OpenList-Worker?color=%23ED8936" alt="discussions" /></a>
-<a href="https://github.com/OpenListTeam/OpenList-Worker/releases"><img src="https://img.shields.io/github/downloads/OpenListTeam/OpenList-Worker/total?color=%239F7AEA&logo=github" alt="Downloads" /></a>
+<a href="https://github.com/jinzhenyi/Storlane/blob/main/LICENSE"><img src="https://img.shields.io/github/license/jinzhenyi/Storlane" alt="License" /></a>
+<a href="https://github.com/jinzhenyi/Storlane/actions/workflows/edgeone-artifact-guard.yml"><img src="https://img.shields.io/github/actions/workflow/status/jinzhenyi/Storlane/edgeone-artifact-guard.yml?branch=main" alt="Build status" /></a>
+<a href="https://github.com/jinzhenyi/Storlane/releases"><img src="https://img.shields.io/github/release/jinzhenyi/Storlane" alt="latest version" /></a>
+<a href="https://github.com/jinzhenyi/Storlane/discussions"><img src="https://img.shields.io/github/discussions/jinzhenyi/Storlane?color=%23ED8936" alt="discussions" /></a>
+<a href="https://github.com/jinzhenyi/Storlane/releases"><img src="https://img.shields.io/github/downloads/jinzhenyi/Storlane/total?color=%239F7AEA&logo=github" alt="Downloads" /></a>
 
 📘 [사용 문서](https://doc.oplist.org) · 🌏 [사용 문서（중국 본토）](https://doc.oplist.org.cn)  · ⚖️ [이용 약관](https://doc.oplist.org/terms)  · 🔒 [개인정보 처리방침](https://doc.oplist.org/privacy)
 
@@ -21,7 +21,7 @@
 
 [Português](README_pt.md) | [Русский](README_ru.md) | [العربية](README_ar.md) | [Italiano](README_it.md) | [हिन्दी](README_hi.md) | [Español](README_es.md)
 
-[업스트림 프로젝트](https://github.com/OpenListTeam/OpenList) · [기여 가이드](https://github.com/OpenListTeam/OpenList-Worker/blob/main/CONTRIBUTING.md) · [행동 강령](https://github.com/OpenListTeam/OpenList-Worker/blob/main/CODE_OF_CONDUCT.md) · [라이선스](./LICENSE)
+[업스트림 프로젝트](https://github.com/jinzhenyi/Storlane) · [기여 가이드](https://github.com/jinzhenyi/Storlane/blob/main/CONTRIBUTING.md) · [행동 강령](https://github.com/jinzhenyi/Storlane/blob/main/CODE_OF_CONDUCT.md) · [라이선스](./LICENSE)
 
 [🌎 글로벌 데모](https://new.oplist.org) 　|　 [🇨🇳 중국 데모](https://new.oplist.org.cn)
 
@@ -37,12 +37,12 @@
 
 | EdgeOne Makers · 국제 | EdgeOne Makers · 중국 | Cloudflare Workers · 글로벌 |
 | :---: | :---: | :---: |
-| [![EdgeOne에 배포](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/pages/new?project-name=openlist-tsworker&repository-url=https://github.com/OpenListTeam/OpenList-Worker&install-command=pnpm%20install%20--no-frozen-lockfile&build-command=pnpm%20run%20build&output-directory=dist&env=JWT_SECRET) | [![EdgeOne에 배포](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://console.cloud.tencent.com/edgeone/pages/new?project-name=openlist-tsworker&repository-url=https://github.com/OpenListTeam/OpenList-Worker&install-command=pnpm%20install%20--no-frozen-lockfile&build-command=pnpm%20run%20build&output-directory=dist&env=JWT_SECRET) | [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/OpenListTeam/OpenList-Worker) |
+| [![EdgeOne에 배포](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/pages/new?project-name=storlane&repository-url=https://github.com/jinzhenyi/Storlane&install-command=pnpm%20install%20--no-frozen-lockfile&build-command=pnpm%20run%20build&output-directory=dist&env=JWT_SECRET) | [![EdgeOne에 배포](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://console.cloud.tencent.com/edgeone/pages/new?project-name=storlane&repository-url=https://github.com/jinzhenyi/Storlane&install-command=pnpm%20install%20--no-frozen-lockfile&build-command=pnpm%20run%20build&output-directory=dist&env=JWT_SECRET) | [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/jinzhenyi/Storlane) |
 
 </div>
 
 > [!IMPORTANT]
-> - Cloudflare에서 `저장소 콘텐츠를 가져올 수 없습니다`라고 표시되면, 먼저 이 프로젝트를 [Fork](https://github.com/OpenListTeam/OpenList-Worker/fork)한 다음 Github 저장소 연결 기능으로 배포하세요
+> - Cloudflare에서 `저장소 콘텐츠를 가져올 수 없습니다`라고 표시되면, 먼저 이 프로젝트를 [Fork](https://github.com/jinzhenyi/Storlane/fork)한 다음 Github 저장소 연결 기능으로 배포하세요
 > - 배포 후 환경 변수를 설정합니다： **EdgeOne**：[국제 콘솔](https://console.edgeone.ai/makers) · [중국 콘솔](https://console.cloud.tencent.com/edgeone/makers)；**Cloudflare**：[Worker 대시보드](https://dash.cloudflare.com/)。환경 변수：
 >   - `DB_FORMAT`: 데이터 저장 형식: `map` (기본값, 전체 객체 JSON) / `key` (키별 저장) / `sql` (관계형 테이블, Go 백엔드 호환)
 >   - `DB_DRIVER`: 데이터베이스 드라이버: `auto` (기본값, 자동 감지) / `blob` / `cfkv` / `kv` / `d1` / `mysql`
@@ -51,9 +51,9 @@
 
 ## 기능 소개
 
-OpenList는 엣지 컴퓨팅 플랫폼에서 실행되는 다중 스토리지 집계 파일 목록 및 관리 시스템으로, 여러 클라우드 드라이브, 오브젝트 스토리지, 프로토콜 서비스에 분산된 파일을 하나의 인터페이스에 통합하여 탐색, 미리보기, 다운로드, 관리할 수 있습니다.
+Storlane는 엣지 컴퓨팅 플랫폼에서 실행되는 다중 스토리지 집계 파일 목록 및 관리 시스템으로, 여러 클라우드 드라이브, 오브젝트 스토리지, 프로토콜 서비스에 분산된 파일을 하나의 인터페이스에 통합하여 탐색, 미리보기, 다운로드, 관리할 수 있습니다.
 
-OpenList-Worker는 공식 [OpenListTeam/OpenList](https://github.com/OpenListTeam/OpenList) 프로젝트의 TypeScript + Serverless 포팅 버전으로, 백엔드를 Go에서 Workers에서 실행되는 TypeScript 서비스로 재작성했으며, 프런트엔드는 일관된 인터페이스와 상호작용 경험을 유지합니다.
+Storlane는 공식 [jinzhenyi/Storlane](https://github.com/jinzhenyi/Storlane) 프로젝트의 TypeScript + Serverless 포팅 버전으로, 백엔드를 Go에서 Workers에서 실행되는 TypeScript 서비스로 재작성했으며, 프런트엔드는 일관된 인터페이스와 상호작용 경험을 유지합니다.
 
 ### 스토리지 집계
 
@@ -63,7 +63,7 @@ OpenList-Worker는 공식 [OpenListTeam/OpenList](https://github.com/OpenListTea
 - **국제 클라우드 드라이브**：Google Drive（앨범）、OneDrive（앱/공유 링크）、Dropbox、MEGA、MediaFire、Proton Drive、Yandex Disk、Degoo、Bunny Storage、TeraBox 등
 - **오브젝트 스토리지**：S3 호환（AWS/OSS/COS/MinIO 등）、UpYun USS、Azure Blob、WebDAV、FTP、SFTP、SMB、IPFS 등
 - **코드 호스팅**：GitHub、GitHub Releases、CNB Releases
-- **클라우드 드라이브 프로그램**：OpenList（공유）、AList V3、Cloudreve V3/V4、Kodbox、Seafile、Teldrive、Febbox 등
+- **클라우드 드라이브 프로그램**：Storlane（공유）、AList V3、Cloudreve V3/V4、Kodbox、Seafile、Teldrive、Febbox 등
 - **기타 드라이버**：Netease Music、Misskey、Emby、Cloudflare 이미지 호스팅 등
 
 위의 실제 스토리지 외에도 `Local`、`Alias`、`UrlTree`、`AutoIndex`、`Strm`、`Crypt`、`Virtual`、`Chunk` 등의 가상/기능 드라이버를 제공하여 로컬 마운트, 주소 별칭, URL 목록, 암호화 스토리지, 청크 분할 등의 시나리오를 지원합니다.
@@ -152,24 +152,24 @@ pnpm run deploy:worker
 
 사용 중 문제가 발생하면 다음 채널을 통해 도움을 받을 수 있습니다：
 
-- 🐛 **버그 신고 또는 기능 요청**：[_Issues_](https://github.com/OpenListTeam/OpenList-Worker/issues)로 이동
-- 💬 **일반 질문 및 소통**：[_Discussions_](https://github.com/OpenListTeam/OpenList/discussions) 포럼으로 이동
+- 🐛 **버그 신고 또는 기능 요청**：[_Issues_](https://github.com/jinzhenyi/Storlane/issues)로 이동
+- 💬 **일반 질문 및 소통**：[_Discussions_](https://github.com/jinzhenyi/Storlane/discussions) 포럼으로 이동
 
 ## 라이선스
 
-`OpenList`는 [AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.txt) 라이선스 하에 제공되는 오픈소스 소프트웨어입니다.
+`Storlane`는 [AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.txt) 라이선스 하에 제공되는 오픈소스 소프트웨어입니다.
 
 
 ## 문의하기
 
-🌐 [@GitHub](https://github.com/OpenListTeam) · ✈️ [Telegram 그룹](https://t.me/OpenListTeam) · ✈️ [Telegram 채널](https://t.me/OpenListOfficial)
+🌐 [@GitHub](https://github.com/StorlaneTeam) · ✈️ [Telegram 그룹](https://t.me/StorlaneTeam) · ✈️ [Telegram 채널](https://t.me/StorlaneOfficial)
 
 ## 기여자
 
 다음 프로젝트와 그 기여자들에게 감사드립니다：
 
 - [Alist](https://github.com/AlistGo/alist) 프로젝트 작성자 및 모든 기여자
-- [OpenList](https://github.com/OpenListTeam/OpenList)（Go 버전）프로젝트 작성자 및 모든 기여자
+- [Storlane](https://github.com/jinzhenyi/Storlane)（Go 버전）프로젝트 작성자 및 모든 기여자
 - 이 프로젝트의 모든 기여자：
 
-[![Contributors](https://contrib.rocks/image?repo=OpenListTeam/OpenList-Worker)](https://github.com/OpenListTeam/OpenList-Worker/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=jinzhenyi/Storlane)](https://github.com/jinzhenyi/Storlane/graphs/contributors)
