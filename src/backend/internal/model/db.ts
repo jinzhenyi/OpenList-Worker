@@ -55,7 +55,7 @@ export const defaultDb = {
     },
     {
       key: "site_title",
-      value: "OpenList",
+      value: "Storlane",
       type: "string",
       help: "Site Title",
       group: 1,
@@ -114,7 +114,7 @@ export const defaultDb = {
     // Group 2: STYLE (https://doc.oplist.org/configuration/style)
     {
       key: "logo",
-      value: "https://res.oplist.org/logo/logo.svg",
+      value: "",
       type: "string",
       help: "Site Logo URL",
       group: 2,
@@ -122,7 +122,7 @@ export const defaultDb = {
     },
     {
       key: "favicon",
-      value: "https://res.oplist.org/logo/logo.svg",
+      value: "",
       type: "string",
       help: "Favicon URL",
       group: 2,
@@ -1348,14 +1348,29 @@ let plaintextMigrationLogged = false
  * 注意：这是 **KV 存储槽位名**，不是环境变量名。历史部署已用它存过密钥，
  * 改名会导致既有密文无法解密，故保持不变。
  */
-export const ENCRYPTION_SECRET_KV_KEY = "openlist_encryption_secret"
+export const ENCRYPTION_SECRET_KV_KEY = "storlane_encryption_secret"
+
+/**
+ * 旧品牌（OpenList 时代）的字段加密密钥槽位名，仅用于**向后兼容读取**。
+ *
+ * 改名后新槽位为空时回退到旧槽位，保证既有密文仍可解密；写入始终使用新槽位
+ * （见 ENCRYPTION_SECRET_KV_KEY），下一次保存即完成迁移。
+ */
+const LEGACY_ENCRYPTION_SECRET_KV_KEY = "openlist_encryption_secret"
+
+/** 读取字段加密密钥：优先新槽位，回退旧槽位（读兼容，写新槽位）。 */
+async function readEncryptionSecret(env: any): Promise<string | null> {
+  const current = await readPersistedSecret(env, ENCRYPTION_SECRET_KV_KEY)
+  if (current && current.trim().length > 0) return current
+  return await readPersistedSecret(env, LEGACY_ENCRYPTION_SECRET_KV_KEY)
+}
 
 /**
  * 解析「环境变量中显式配置的」字段加密密钥。
  *
  * 约定：字段加密与 JWT 签名都优先使用 JWT_SECRET 环境变量。
  * 但两者在「未配置 env」时的持久化槽位是独立的
- * （加密 → openlist_encryption_secret，签名 → openlist_jwt_secret），
+ * （加密 → storlane_encryption_secret，签名 → storlane_jwt_secret），
  * 因此未配置 JWT_SECRET 的部署中二者会是不同的随机值——这不影响正确性，
  * 加密与签名本就无需同钥。
  *
@@ -1404,7 +1419,7 @@ let cachedFromEnv = false
  *
  * 优先级：
  *   1. env.JWT_SECRET
- *   2. 持久化密钥 openlist_encryption_secret（由 setup 阶段写入）
+ *   2. 持久化密钥 storlane_encryption_secret（由 setup 阶段写入）
  *
  * 关键约束（保证加解密对称）：
  *   - 生成只发生在 setup，见 ensureEncryptionSecret()。此处绝不生成，
@@ -1433,7 +1448,7 @@ async function getEncryptionKey(envCtx?: any): Promise<string | null> {
 
   // 回退到持久化密钥（仅读取）
   try {
-    const persisted = await readPersistedSecret(env, ENCRYPTION_SECRET_KV_KEY)
+    const persisted = await readEncryptionSecret(env)
     if (persisted && persisted.trim().length > 0) {
       cachedEncryptionKey = persisted
       cachedFromEnv = false
@@ -1476,7 +1491,7 @@ export async function isEncryptionReady(envCtx?: any): Promise<boolean> {
 
   // 直查持久化（不走缓存）
   try {
-    const persisted = await readPersistedSecret(env, ENCRYPTION_SECRET_KV_KEY)
+    const persisted = await readEncryptionSecret(env)
     return Boolean(persisted && persisted.trim().length > 0)
   } catch {
     return false
@@ -1548,7 +1563,7 @@ export async function ensureEncryptionSecret(
     if (envKey) return envKey
 
     // 2. 已存在则复用（存在性门控，永不覆盖）
-    const existing = await readPersistedSecret(env, ENCRYPTION_SECRET_KV_KEY)
+    const existing = await readEncryptionSecret(env)
     if (existing && existing.trim().length > 0) {
       cachedEncryptionKey = existing
       cachedFromEnv = false
@@ -1577,7 +1592,7 @@ export async function ensureEncryptionSecret(
 
     let delay = SECRET_VERIFY_BASE_MS
     for (let i = 0; i < SECRET_VERIFY_RETRIES; i++) {
-      const readBack = await readPersistedSecret(env, ENCRYPTION_SECRET_KV_KEY)
+      const readBack = await readEncryptionSecret(env)
       if (readBack === generated) {
         console.log(
           `[DB] Generated and persisted a new encryption key ` +
@@ -1740,7 +1755,7 @@ async function unsealValue(
       console.error(
         "[DB] Sealed values found in storage but no encryption key is " +
           "available; they will be left as-is (set JWT_SECRET, or restore the " +
-          "original openlist_encryption_secret).",
+          "original storlane_encryption_secret).",
       )
     }
     return value

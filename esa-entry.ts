@@ -178,7 +178,7 @@ export default {
     }
     const edgeKvCtor = getEdgeKVCtorAtRequestTime()
     if (env && typeof env !== "undefined") {
-      const namespace = env.KV_NAMESPACE || "openlist"
+      const namespace = env.KV_NAMESPACE || "storlane"
       if (edgeKvCtor) {
         try {
           const edgeKv = new edgeKvCtor({ namespace })
@@ -186,7 +186,7 @@ export default {
           let kvTestOk = false
           let kvTestErr: string | null = null
           try {
-            await edgeKv.get("__openlist_probe__")
+            await edgeKv.get("__storlane_probe__")
             kvTestOk = true
           } catch (e: any) {
             kvTestErr = e?.message || String(e)

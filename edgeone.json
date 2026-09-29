@@ -1,5 +1,5 @@
 {
-  "name": "openlist",
+  "name": "storlane",
   "installCommand": "pnpm install --no-frozen-lockfile",
   "buildCommand": "pnpm run build",
   "outputDirectory": "dist",

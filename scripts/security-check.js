@@ -58,7 +58,7 @@ function checkEnvVar(config) {
 }
 
 function main() {
-  console.log('🔒 OpenList-TSWorker 安全配置检查\n')
+  console.log('🔒 Storlane 安全配置检查\n')
   console.log('=' .repeat(60))
   
   const isProduction = process.env.NODE_ENV === 'production' || 

@@ -1,4 +1,4 @@
-service: openlist
+service: storlane
 
 frameworkVersion: "4"
 

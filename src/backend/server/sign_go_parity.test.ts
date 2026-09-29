@@ -32,7 +32,7 @@ import {
 const tmpRoots: string[] = []
 
 function makeLocalRoot(files: string[]): string {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "openlist-parity-"))
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "storlane-parity-"))
   for (const name of files) fs.writeFileSync(path.join(root, name), "x")
   tmpRoots.push(root)
   return root

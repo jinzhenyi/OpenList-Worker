@@ -1,5 +1,5 @@
 /**
- * Stream utilities for OpenList.
+ * Stream utilities for Storlane.
  * Uses Web Streams API for cross-runtime compatibility (Cloudflare Workers / Node.js).
  */
 

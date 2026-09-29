@@ -18,8 +18,8 @@ import { getStoreStatus } from "../internal/model/store/backend"
  *   2. JWT_SECRET「必须手动配置」其实不准确 —— 支持自动生成并持久化。
  *      但旧实现存在**自死锁**：`ready = storageAvailable && jwtReady`，
  *      而自动生成只在提交初始化时执行，向导却被 ready 挡住进不到那一步；
- *      且 JWT 侧读的是 openlist_jwt_secret、自动生成写的是
- *      openlist_encryption_secret，两个槽位名不同 → 「自动生成」永远不可见。
+ *      且 JWT 侧读的是 storlane_jwt_secret、自动生成写的是
+ *      storlane_encryption_secret，两个槽位名不同 → 「自动生成」永远不可见。
  *
  *   3. 合法的「驱动 × 格式」矩阵应只有：
  *        blob + map
@@ -256,10 +256,10 @@ test("未配置 JWT_SECRET：初始化成功后必须自动生成并持久化密
 
   // 自动生成的密钥必须落到加密密钥槽位，并被 JWT 侧可见（否则就是
   // 「看着生成了、实际没生效」：JWT 侧读的是另一个槽位名）。
-  const generated = kv.__store.get("openlist_encryption_secret")
+  const generated = kv.__store.get("storlane_encryption_secret")
   assert.ok(
     generated && generated.length > 0,
-    "setup 必须把自动生成的密钥持久化到 openlist_encryption_secret",
+    "setup 必须把自动生成的密钥持久化到 storlane_encryption_secret",
   )
 
   // 再来一次 env_check：此时密钥已就绪
@@ -277,8 +277,8 @@ test("未配置 JWT_SECRET：初始化成功后必须自动生成并持久化密
   assert.equal(afterData.jwt.source, "env-or-persisted")
 
   // 关键不变量：JWT 侧实际使用的密钥必须**就是** setup 生成的那把。
-  // 历史 bug：JWT 读 openlist_jwt_secret、setup 写
-  // openlist_encryption_secret —— 两个槽位名不同，于是 JWT 侧看不到生成结果，
+  // 历史 bug：JWT 读 storlane_jwt_secret、setup 写
+  // storlane_encryption_secret —— 两个槽位名不同，于是 JWT 侧看不到生成结果，
   // 又自己生成一把写入另一个槽位。结果是「生成了一份，却有两把在漂移」，
   // 多实例验签互相失败、冷启动即换钥。这里直接比对密钥值。
   const { getJwtSecret, resetJwtSecretCache } = await import("./middlewares")

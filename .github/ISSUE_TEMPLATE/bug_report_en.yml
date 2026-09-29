@@ -1,13 +1,13 @@
 name: "Bug Report"
-description: Bug Report / Issue (OpenList-Worker)
+description: Bug Report / Issue (Storlane)
 title: "[BUG] Please modify the title to describe the issue you are facing"
 labels: [bug]
 body:
   - type: markdown
     attributes:
       value: |
-        Thank you for taking the time to report an issue — it helps make OpenList-Worker better.
-        Before submitting, please check the [discussions](https://github.com/OpenListTeam/OpenList-Worker/discussions) for an existing report to avoid duplicates.
+        Thank you for taking the time to report an issue — it helps make Storlane better.
+        Before submitting, please check the [discussions](https://github.com/jinzhenyi/Storlane/discussions) for an existing report to avoid duplicates.
 
   - type: checkboxes
     attributes:
@@ -32,7 +32,7 @@ body:
     id: platform
     attributes:
       label: Platform (required)
-      description: Which platform is OpenList-Worker deployed on?
+      description: Which platform is Storlane deployed on?
       options:
         - Cloudflare Workers
         - EdgeOne Makers

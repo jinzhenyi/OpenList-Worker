@@ -1,5 +1,5 @@
 /**
- * Simple cron-like task scheduler for OpenList.
+ * Simple cron-like task scheduler for Storlane.
  */
 
 export type CronJob = () => Promise<void> | void

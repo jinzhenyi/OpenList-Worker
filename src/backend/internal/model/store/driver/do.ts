@@ -1,20 +1,20 @@
 /**
  * Cloudflare Durable Objects 驱动。
  *
- * 通过 DO binding 获取 stub，RPC 调用 OpenListDB 实例的方法。每个实例用
- * `idFromName` 定位（默认 ID "openlist-db"），保证数据持久在同一实例。
+ * 通过 DO binding 获取 stub，RPC 调用 StorlaneDB 实例的方法。每个实例用
+ * `idFromName` 定位（默认 ID "storlane-db"），保证数据持久在同一实例。
  *
  * 配置：
  * - DO binding 名固定为 `DO`
- * - DO_ID: DO 实例名称（可选，默认 "openlist-db"）
+ * - DO_ID: DO 实例名称（可选，默认 "storlane-db"）
  *
  * 需在 wrangler.toml 配置：
  *   [[durable_objects.bindings]]
  *   name = "DO"
- *   class_name = "OpenListDB"
+ *   class_name = "StorlaneDB"
  *   [[migrations]]
  *   tag = "v1"
- *   new_sqlite_classes = ["OpenListDB"]
+ *   new_sqlite_classes = ["StorlaneDB"]
  */
 import type { Driver } from "../types"
 
@@ -48,7 +48,7 @@ function getDoBinding(env?: any): any | null {
 
 function getDoId(env?: any): string {
   const e = env || (typeof process !== "undefined" ? process.env : {}) || {}
-  return String(e?.DO_ID || "openlist-db")
+  return String(e?.DO_ID || "storlane-db")
 }
 
 function getStub(env?: any): any | null {

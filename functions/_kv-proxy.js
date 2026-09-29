@@ -14,10 +14,12 @@
  *  3. 其余一律 401
  *
  * JWT 密钥来源与 Node 侧保持一致：
- *  env.JWT_SECRET -> KV 中的 openlist_jwt_secret -> （都没有则拒绝用户调用）
+ *  env.JWT_SECRET -> KV 中的 storlane_jwt_secret -> （都没有则拒绝用户调用）
  */
 
-const JWT_SECRET_KV_KEY = "openlist_jwt_secret"
+const JWT_SECRET_KV_KEY = "storlane_jwt_secret"
+// 旧品牌（OpenList 时代）槽位名：仅用于兼容读取。
+const LEGACY_JWT_SECRET_KV_KEY = "openlist_jwt_secret"
 const ADMIN_ROLE = 2
 
 /* ─────────────────────────── KV 绑定解析 ─────────────────────────── */
@@ -59,13 +61,18 @@ export async function getJwtSecret(env) {
     return envSecret
   }
 
-  // 2) KV 持久化密钥（与 Node 侧共用 openlist_jwt_secret）
+  // 2) KV 持久化密钥（与 Node 侧共用 storlane_jwt_secret）
   try {
     const kv = resolveKv(env)
     if (kv) {
       const val = await kv.get(JWT_SECRET_KV_KEY, { type: "text" })
       if (typeof val === "string" && val.length >= 16) {
         return val
+      }
+      // 改名兼容：新槽位为空时回退旧槽位（openlist_jwt_secret）。
+      const legacy = await kv.get(LEGACY_JWT_SECRET_KV_KEY, { type: "text" })
+      if (typeof legacy === "string" && legacy.length >= 16) {
+        return legacy
       }
     }
   } catch {

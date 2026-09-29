@@ -436,7 +436,7 @@ webauthnRouter.post("/webauthn_begin_registration", async (c) => {
 
   const options: any = {
     challenge: sd.challenge,
-    rp: { name: getStrSetting(db, "site_title", "OpenList"), id: rpId },
+    rp: { name: getStrSetting(db, "site_title", "Storlane"), id: rpId },
     user: {
       id: b64urlEncode(userIdBytes),
       name: user.username,

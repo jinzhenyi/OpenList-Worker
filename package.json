@@ -1,5 +1,5 @@
 {
-  "name": "openlist",
+  "name": "storlane",
   "version": "4.2.3",
   "type": "module",
   "packageManager": "pnpm@9.15.4",
@@ -26,20 +26,20 @@
     }
   },
   "author": {
-    "name": "The OpenListTeam Contributors"
+    "name": "Storlane Contributors"
   },
-  "description": "A file list program that supports multiple storages, powered by OpenList (TypeScript / Cloudflare Workers port)",
+  "description": "Storlane - a multi-storage file list and management service (TypeScript / Serverless)",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/OpenListTeam/OpenList.git"
+    "url": "git+https://github.com/jinzhenyi/Storlane.git"
   },
   "bugs": {
-    "url": "https://github.com/OpenListTeam/OpenList/issues"
+    "url": "https://github.com/jinzhenyi/Storlane/issues"
   },
   "files": [
     "dist"
   ],
-  "homepage": "https://doc.oplist.org",
+  "homepage": "https://github.com/jinzhenyi/Storlane#readme",
   "scripts": {
     "start": "node dist-server/api/[...route].js",
     "fetch:frontend": "node scripts/fetch-frontend.mjs",

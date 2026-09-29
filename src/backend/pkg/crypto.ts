@@ -1,5 +1,5 @@
 /**
- * Crypto utilities for OpenList.
+ * Crypto utilities for Storlane.
  * Uses Web Crypto API (crypto.subtle + crypto.getRandomValues) —
  * compatible with Cloudflare Workers and Node.js 18+.
  * All functions are async.

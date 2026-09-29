@@ -135,7 +135,7 @@ export class GithubApiClient {
     const h: Record<string, string> = {
       Accept: "application/vnd.github.object+json",
       "X-GitHub-Api-Version": "2022-11-28",
-      "User-Agent": "OpenList-Github-Driver",
+      "User-Agent": "Storlane-Github-Driver",
     }
     if (this.token) {
       h.Authorization = `Bearer ${this.token}`

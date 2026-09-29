@@ -79,7 +79,7 @@ try {
   check("users_1", codec.entityKeyOf("users", "1") === "users_1", codec.entityKeyOf("users", "1"))
   check("下划线不转义", codec.entityKeyOf("settings", "site_title") === "settings_site_title")
   check("无 xx 冗余", !codec.entityKeyOf("settings", "site_title").includes("xx"))
-  check("无历史前缀", !codec.entityKeyOf("users", "1").includes("openlist_tbl"))
+  check("无历史前缀", !codec.entityKeyOf("users", "1").includes("storlane_tbl"))
   const uuid = "550e8400-e29b-41d4-a716-446655440000"
   check("UUID 合法", KV_RE.test(codec.entityKeyOf("users", uuid)))
   check("UUID 可逆", codec.decodeKeyPart(codec.encodeKeyPart(uuid)) === uuid)
@@ -108,7 +108,7 @@ try {
     {
       users: [{ id: 1, username: "admin" }, { id: uuid, username: "u2" }],
       storages: [{ id: "s-1" }],
-      settings: [{ key: "site_title", value: "OpenList" }],
+      settings: [{ key: "site_title", value: "Storlane" }],
       shares: [{ id: "a/b" }], metas: [], plugins: [],
     },
     strict, {},
@@ -252,7 +252,7 @@ try {
   const envR1 = { DB_DRIVER: "kv", DB_FORMAT: "map", KV: dkv1.binding, __requestOrigin: origin }
   const genKey = await dbMod.ensureEncryptionSecret(envR1)
   check("延迟 KV 下生成成功", typeof genKey === "string" && genKey.length >= 16)
-  check("生成后 KV 内可读", dkv1.store.get("openlist_encryption_secret") === genKey)
+  check("生成后 KV 内可读", dkv1.store.get("storlane_encryption_secret") === genKey)
   check("生成后判定就绪", (await dbMod.isEncryptionReady(envR1)) === true)
 
   // 幂等：再次调用复用同一密钥，不覆盖

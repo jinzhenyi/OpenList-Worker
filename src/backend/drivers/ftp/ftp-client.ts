@@ -1,4 +1,4 @@
-// Pure TypeScript FTP Client for OpenList
+// Pure TypeScript FTP Client for Storlane
 // Dynamic import for Node runtime; safe for edge packaging.
 
 import { FTPAddition, FTPFileEntry } from "./types"

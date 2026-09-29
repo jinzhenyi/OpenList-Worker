@@ -2,7 +2,7 @@
 import { BunnyAddition, BunnyApiError } from "./types"
 
 export const bunnyDefaultEndpoint = "storage.bunnycdn.com"
-export const bunnyDefaultPlaceholder = ".openlist"
+export const bunnyDefaultPlaceholder = ".storlane"
 
 export function normalizeBaseURL(raw: string, fallback: string): string {
   let s = (raw || "").trim()

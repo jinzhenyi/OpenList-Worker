@@ -1,12 +1,12 @@
-# OpenList-Worker 项目介绍
+# Storlane 项目介绍
 
 > 本文是项目定位、架构与设计思路的介绍，不包含部署与使用步骤。
 
 ## 一、项目定位
 
-OpenList 是一个多存储聚合的文件列表与管理系统：把分散在不同网盘、对象存储和协议服务中的文件，统一到一个界面中浏览、预览、下载和管理。
+Storlane 是一个多存储聚合的文件列表与管理系统：把分散在不同网盘、对象存储和协议服务中的文件，统一到一个界面中浏览、预览、下载和管理。
 
-本仓库是官方 [OpenListTeam/OpenList](https://github.com/OpenListTeam/OpenList)（Go 版）的 **TypeScript + Serverless 移植版**（仓库名 `openlist-tsworker`，包名 `openlist`，版本 `4.2.3`）。其核心差异在于：
+本仓库基于官方 [OpenListTeam/OpenList](https://github.com/OpenListTeam/OpenList)（Go 版）的 **TypeScript + Serverless 移植版**（仓库名 `Storlane`，包名 `storlane`，版本 `4.2.3`）再品牌化而来。其核心差异在于：
 
 - **后端由 Go 重写为 TypeScript**，运行在边缘计算与 Serverless 运行时上，而不是传统常驻进程；
 - **前端保持与官方一致的界面与交互**，复用官方前端产物；

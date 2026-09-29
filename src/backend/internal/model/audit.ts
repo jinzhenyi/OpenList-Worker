@@ -25,7 +25,7 @@ export interface AuditLog {
 // 内存缓存（进程内，最多保留 1000 条）
 let auditLogs: AuditLog[] = []
 const MAX_MEMORY_LOGS = 1000
-const AUDIT_LOG_KV_KEY = "openlist_audit_logs"
+const AUDIT_LOG_KV_KEY = "storlane_audit_logs"
 
 /**
  * 记录审计日志

@@ -16,7 +16,9 @@ import {
   entityToRow,
 } from "../schema"
 
-const INIT_MARK = "openlist_config"
+const INIT_MARK = "storlane_config"
+/** 旧品牌（OpenList 时代）的初始化标记：仅用于兼容读取，保存时迁移。 */
+const LEGACY_INIT_MARK = "openlist_config"
 
 function quote(name: string): string {
   return "`" + name + "`"
@@ -91,11 +93,19 @@ export const sqlFormat: FormatAdapter = {
     }
 
     // 检查是否已初始化（schema_info 为 TS 内部标记表，不加前缀）
-    const marks = await driver.query(
+    // 改名兼容：新标记为空时回退旧标记，避免既有库被判定为未初始化。
+    let marks = await driver.query(
       "SELECT v FROM schema_info WHERE k = ?",
       [INIT_MARK],
       env,
     )
+    if (!marks || marks.length === 0) {
+      marks = await driver.query(
+        "SELECT v FROM schema_info WHERE k = ?",
+        [LEGACY_INIT_MARK],
+        env,
+      )
+    }
     if (!marks || marks.length === 0) return null
 
     const out: Record<string, any> = {}

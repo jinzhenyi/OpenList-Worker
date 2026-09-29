@@ -346,8 +346,8 @@ publicRouter.get("/settings", async (c) => {
   // Source: internal/bootstrap/data/setting.go + internal/conf/const.go
   const settingsObj: Record<string, string> = {
     // --- Site ---
-    title: "OpenList",
-    site_title: "OpenList",
+    title: "Storlane",
+    site_title: "Storlane",
     version: "v4.2.3",
     // 后端类型标识：前端据此在 GO / TS 模式间切换功能开关。
     // Go 版 OpenList 后端不返回此字段，前端缺省视为 "go"。

@@ -71,7 +71,7 @@ test("配置 ASSET_URLS 时，仅四个静态目录 302 到 CDN，且 $version �
 
 test("ASSET_URLS 含 $version 占位符时不留占位符（取不到版本则 latest）", async () => {
   const env = {
-    ASSET_URLS: "https://cdn.example.com/openlist/$version/files/dist",
+    ASSET_URLS: "https://cdn.example.com/storlane/$version/files/dist",
   }
   const res = await appWithSpaFallback().request(
     "/assets/app.js",

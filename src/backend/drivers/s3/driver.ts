@@ -21,7 +21,7 @@ export function normalizeS3Addition(a: any): S3Addition {
   const norm = { ...(a || {}) } as any
   norm.bucket = (norm.bucket || "").trim()
   norm.endpoint = (norm.endpoint || "").trim()
-  norm.region = (norm.region || "").trim() || "openlist"
+  norm.region = (norm.region || "").trim() || "storlane"
   norm.access_key_id = (norm.access_key_id || "").trim()
   norm.secret_access_key = (norm.secret_access_key || "").trim()
   norm.session_token = (norm.session_token || "").trim()

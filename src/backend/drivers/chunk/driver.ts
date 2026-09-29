@@ -36,7 +36,7 @@ export class ChunkDriver implements StorageDriver {
 
   constructor(addition: ChunkAddition) {
     this.addition = addition || {}
-    this.chunkPrefix = this.addition.chunk_prefix || "[openlist_chunk]"
+    this.chunkPrefix = this.addition.chunk_prefix || "[storlane_chunk]"
     this.customExt = this.addition.custom_ext || ""
     this.partSize = Number(this.addition.part_size) || 0
   }

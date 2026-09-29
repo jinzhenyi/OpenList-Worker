@@ -352,7 +352,7 @@ test("getProxyPayloadLimit: 按 EdgeOne Node 云函数（SCF）与 Blob 绑定�
   // EdgeOne Node 云函数跑在腾讯 SCF 上，平台注入该变量（见 store/backend.ts）
   assert.equal(
     getProxyPayloadLimit({
-      env: { TENCENTCLOUD_SCF_FUNCTIONNAME: "openlist" },
+      env: { TENCENTCLOUD_SCF_FUNCTIONNAME: "storlane" },
     }),
     EDGE_LIMIT,
   )
@@ -500,7 +500,7 @@ test("isAuthBoundDownload: 强制代理驱动与私有头判定", () => {
   // 只有 UA / Referer 不算私有头（如 115open 的 UA、S3 的 Referer）
   assert.equal(
     isAuthBoundDownload("s3", {
-      "User-Agent": "openlist",
+      "User-Agent": "storlane",
       Referer: "https://x",
     }),
     false,

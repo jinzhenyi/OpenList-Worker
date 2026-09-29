@@ -21,7 +21,9 @@ import type { FormatAdapter, Driver } from "../types"
 import { TABLE_NAMES, TABLE_KEY, type TableName } from "../schema"
 import { entityKeyOf, tableKeyPrefix } from "../keycodec"
 
-const INIT_MARK = "openlist_config"
+const INIT_MARK = "storlane_config"
+/** 旧品牌（OpenList 时代）的初始化标记：仅用于兼容读取，保存时迁移。 */
+const LEGACY_INIT_MARK = "openlist_config"
 
 /** 构造表前缀（使用共享键名编码，兼容 EdgeOne KV 字符集约束） */
 function tablePrefix(table: string): string {
@@ -37,8 +39,9 @@ export const keyFormat: FormatAdapter = {
   name: "key",
 
   async load(driver: Driver, env?: any): Promise<any | null> {
-    // 检查是否已初始化
-    const mark = await driver.get(INIT_MARK, env)
+    // 检查是否已初始化（改名兼容：新标记为空时回退旧标记）
+    let mark = await driver.get(INIT_MARK, env)
+    if (!mark) mark = await driver.get(LEGACY_INIT_MARK, env)
     if (!mark) return null
 
     const out: Record<string, any> = {}

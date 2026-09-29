@@ -56,7 +56,7 @@ function envFor(cipher?: string): any {
 function sampleDb() {
   return {
     settings: [
-      { key: "site_title", value: "OpenList" },
+      { key: "site_title", value: "Storlane" },
       { key: "token", value: "tok-123" },
     ],
     users: [
@@ -274,7 +274,7 @@ test("DB_CIPHER 非 none：敏感字段按所选算法落盘，读回自动解�
     }
     assert.notEqual(rawUser(raw).password, "hash-abc")
     // 非敏感设置不应被加密（避免无谓开销）
-    assert.equal(rawSetting(raw, "site_title").value, "OpenList")
+    assert.equal(rawSetting(raw, "site_title").value, "Storlane")
 
     // 冷启动重新加载（绕过内存快照）→ 必须自动解密
     db.__resetDbCacheForTest()
@@ -393,7 +393,7 @@ test("saveDb 采用写时复制：不修改调用方传入的内存对象", asyn
     JSON.stringify({ token: "drive-token" }),
   )
   assert.equal(rawSetting(data, "token").value, "tok-123")
-  assert.equal(rawSetting(data, "site_title").value, "OpenList")
+  assert.equal(rawSetting(data, "site_title").value, "Storlane")
 
   // 落盘内容则是密文
   const raw: any = await rawStored(env)

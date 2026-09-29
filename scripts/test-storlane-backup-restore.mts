@@ -127,7 +127,7 @@ assert(
 
 console.log("\n=== 4. 测试 OpenList 备份 JSON 数据格式模拟恢复 ===")
 // Simulate an unencrypted OpenList v3 backup JSON
-const mockOpenListBackup = {
+const mockStorlaneBackup = {
   version: "v3.39.0",
   settings: [
     { key: "site_title", value: "My OpenList Site", group: 1 },
@@ -159,7 +159,7 @@ const mockOpenListBackup = {
 }
 
 // Verify batch storage import
-for (const rawStorage of mockOpenListBackup.storages) {
+for (const rawStorage of mockStorlaneBackup.storages) {
   const normDriver = normalizeDriver(rawStorage.driver)
   const addRes = await app.request("/api/admin/storage/create", {
     method: "POST",

@@ -1,13 +1,13 @@
 name: "功能请求"
-description: 功能请求 / 增强（OpenList-Worker）
+description: 功能请求 / 增强（Storlane）
 title: "[Feature] 请修改标题为您的功能名称"
 labels: [enhancement]
 body:
   - type: markdown
     attributes:
       value: |
-        感谢您为 OpenList-Worker 提出新想法，这会帮助 OpenList-Worker 变得更好。
-        提交前请先到[讨论区](https://github.com/OpenListTeam/OpenList-Worker/discussions)看看是否已有类似提议，避免重复。
+        感谢您为 Storlane 提出新想法，这会帮助 Storlane 变得更好。
+        提交前请先到[讨论区](https://github.com/jinzhenyi/Storlane/discussions)看看是否已有类似提议，避免重复。
 
   - type: checkboxes
     attributes:

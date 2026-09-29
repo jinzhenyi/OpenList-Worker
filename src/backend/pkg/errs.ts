@@ -15,29 +15,29 @@ export enum ErrorCode {
   TaskNotFound = 1006,
 }
 
-export class OpenListError extends Error {
+export class StorlaneError extends Error {
   constructor(
     public code: ErrorCode,
     public message: string,
     public originalError?: any,
   ) {
     super(message)
-    this.name = "OpenListError"
+    this.name = "StorlaneError"
   }
 }
 
 export const Errs = {
-  PathNotFound: new OpenListError(ErrorCode.PathNotFound, "Path not found"),
-  NotReady: new OpenListError(ErrorCode.StorageNotReady, "Storage not ready"),
-  InvalidConfig: new OpenListError(
+  PathNotFound: new StorlaneError(ErrorCode.PathNotFound, "Path not found"),
+  NotReady: new StorlaneError(ErrorCode.StorageNotReady, "Storage not ready"),
+  InvalidConfig: new StorlaneError(
     ErrorCode.InvalidConfig,
     "Invalid configuration",
   ),
-  Unauthorized: new OpenListError(
+  Unauthorized: new StorlaneError(
     ErrorCode.Unauthorized,
     "Unauthorized access",
   ),
-  Forbidden: new OpenListError(ErrorCode.Forbidden, "Permission denied"),
+  Forbidden: new StorlaneError(ErrorCode.Forbidden, "Permission denied"),
 }
 
 /**

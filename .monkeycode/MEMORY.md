@@ -31,7 +31,7 @@ This file records user instructions, preferences, and project knowledge for refe
 - Context: Discovered by Agent while deploying to Vercel and diagnosing storage/health issues
 - Category: Operations & Deployment
 - Instructions:
-  - 线上部署：Vercel 项目名 `openlist-tsworker`（projectId `prj_r9Sxfgkd271TC6rh2L6wrEx6w61e`，team/scope `jzy-s-projects`，teamId `team_tHnllturntg1DoEvEJsshWBz`），生产域名 `https://openlist-tsworker.vercel.app`。
+  - 线上部署：Vercel 项目名 `openlist-tsworker`（projectId `prj_r9Sxfgkd271TC6rh2L6wrEx6w61e`，team/scope `jzy-s-projects`，teamId `team_tHnllturntg1DoEvEJsshWBz`），生产域名 `https://openlist-tsworker.vercel.app`。项目已按品牌改名为 Storlane（仓库 `jinzhenyi/Storlane`），Vercel 项目名/域名是否同步改名见下方最新条目。
   - 部署流程（CLI）：`vercel build --prod` → `node scripts/vercel-bundle.mjs` → `vercel deploy --prebuilt --prod --token "$VERCEL_TOKEN"`。`vercel deploy` 必须显式传 `--token`。
   - Vercel CLI 的 `whoami` / `env ls` / `env pull` 在本 token 下会失败（`User not found.` / `Could not retrieve Project Settings`），但 REST API（`/v9` 或 `/v10/projects/{id}/env?teamId=...`）可用，环境变量应通过 API 管理。
   - 运行时有效配置可用 `GET /api/public/env_check` 反推；当前为 `DB_DRIVER=vblob`（Vercel Blob，`DB_FORMAT=map`）、`DB_CIPHER=aes-256-gcm`、`CRON_SECRET`（Cron 鉴权，未带 Bearer 访问 `/api/task/refresh` 返回 401）。
@@ -45,3 +45,14 @@ This file records user instructions, preferences, and project knowledge for refe
 - Instructions:
   - 本沙箱对 `*.vercel.app` 的 DNS 会被污染，解析到非 Vercel IP（如 `111.243.214.169`）导致 TLS 失败（`home=000`）。复测线上须绕过本地 DNS：先经 DoH（`https://cloudflare-dns.com/dns-query`）取真实 A 记录（如 `216.198.79.131` / `64.29.17.131`），再用 `curl --resolve openlist-tsworker.vercel.app:443:<ip> ...`。注意 zsh 不会对未加引号的变量做分词，`--resolve` 需内联或存数组。
   - 无鉴权 `POST /api/fs/list` 返回 `401 Unauthorized` 时，通常表示库中的 `guest` 用户被禁用（`getUserFromContext` 的 guest 回退要求 guest 存在且未禁用），与 `DB_CIPHER` 等配置无关。
+
+[Project Knowledge Summary]
+- Date: 2026-09-29
+- Context: Discovered by Agent while rebranding the project from OpenList to an independent service named Storlane
+- Category: Workflow & Collaboration
+- Instructions:
+  - 项目已从 OpenList 品牌改名独立为 **Storlane**：包名 `storlane`、仓库 `jinzhenyi/Storlane`、前端仓库 `jinzhenyi/Storlane-Frontend`、KV 配置键 `storlane_config`、密钥槽位 `storlane_jwt_secret` / `storlane_encryption_secret`、DO 类 `StorlaneDB`、错误类 `StorlaneError`。
+  - **旧键读兼容、写新键（自动迁移）**：`storlane_config` 回退 `openlist_config`（map/key/sql 三种格式各自处理，含 `schema_info` 的初始化标记）、JWT/加密密钥槽位回退旧名、D1 绑定新增 `STORLANE_DB` 别名并保留 `OPENLIST_DB`。
+  - **禁止改名的硬兼容项（改了就破坏既有数据/协议）**：`src/backend/pkg/crypto.ts` 中的 KDF info/salt 字符串（`openlist-config-encryption-*`、`openlist-db-cipher-*`）；种子格式 `SEED_FORMAT="openlist-sharing-seed"` 与 bencode 键 `x-openlist`；挂载驱动 id `openlist` / `openlist_share`（`DriverOpenlist*`、`ClientOpenlist*`、`OpenListShare`）；种子来源类型 `openlist-share` / `openlist-direct`；为通过第三方网盘校验而伪装的 UA（如 `... OpenList/425.6.30`、`... openlist-client`）。
+  - 品牌相关的第三方常量：`api.oplist.org`（百度/夸克等驱动的在线刷新 API）与 `doc.oplist.org`（上游文档链接）为上游真实服务/文档，保留。
+  - 前端构建脚本 `scripts/fetch-frontend.mjs` 已指向 fork `jinzhenyi/Storlane-Frontend`；构建期 `stampFrontendVersion` 的包名匹配放宽为 `/(storlane-frontend|openlist-frontend)/i` 以兼容新旧产物。
