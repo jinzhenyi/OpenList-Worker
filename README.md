@@ -189,4 +189,4 @@ vercel deploy --prebuilt --prod
 - [OpenList](https://github.com/OpenListTeam/OpenList)（Go 版）项目作者及全体贡献者
 - 本项目全体贡献者：
 
-[![Contributors](https://contrib.rocks/image?repo=OpenListTeam/OpenList-Worker)](https://github.com/OpenListTeam/OpenList-Worker/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=jinzhenyi/OpenList-Worker)](https://github.com/jinzhenyi/OpenList-Worker/graphs/contributors)
