@@ -11,8 +11,6 @@
 <a href="https://github.com/OpenListTeam/OpenList-Worker/discussions"><img src="https://img.shields.io/github/discussions/OpenListTeam/OpenList-Worker?color=%23ED8936" alt="discussions" /></a>
 <a href="https://github.com/OpenListTeam/OpenList-Worker/releases"><img src="https://img.shields.io/github/downloads/OpenListTeam/OpenList-Worker/total?color=%239F7AEA&logo=github" alt="Downloads" /></a>
 
-📘 [使用文档](https://doc.oplist.org) · 🌏 [使用文档（中国大陆）](https://doc.oplist.org.cn)  · ⚖️ [使用条款](https://doc.oplist.org/terms)  · 🔒 [隐私政策](https://doc.oplist.org/privacy)
-
 </div>
 
 <div align="center">
@@ -23,351 +21,165 @@
 
 [上游项目](https://github.com/OpenListTeam/OpenList) · [贡献指南](https://github.com/OpenListTeam/OpenList-Worker/blob/main/CONTRIBUTING.md) · [行为准则](https://github.com/OpenListTeam/OpenList-Worker/blob/main/CODE_OF_CONDUCT.md) · [许可证](./LICENSE)
 
-[🌎 全球 Demo](https://new.oplist.org) 　|　 [🇨🇳 中国 Demo](https://new.oplist.org.cn)
-
 </div>
 
 ---
 
-## 一键部署
+## 项目介绍
 
-点击下方按钮，即可将本项目一键部署到对应平台：
-<div align="center">
+OpenList 是一个多存储聚合的文件列表与管理系统：把分散在不同网盘、对象存储和协议服务中的文件，统一到一个界面中浏览、预览、下载和管理。
 
+本仓库是官方 [OpenListTeam/OpenList](https://github.com/OpenListTeam/OpenList)（Go 版）的 **TypeScript + Serverless 移植版**（包名 `openlist`，版本 `4.2.3`）。其核心差异在于：
 
-| EdgeOne Makers · 国际站 | EdgeOne Makers · 中国站 | Cloudflare Workers · 全球站 |
-| :---: | :---: | :---: |
-| [![使用 EdgeOne 部署](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/pages/new?project-name=openlist-tsworker&repository-url=https://github.com/OpenListTeam/OpenList-Worker&install-command=pnpm%20install%20--no-frozen-lockfile&build-command=pnpm%20run%20build&output-directory=dist&env=JWT_SECRET) | [![使用 EdgeOne 部署](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://console.cloud.tencent.com/edgeone/pages/new?project-name=openlist-tsworker&repository-url=https://github.com/OpenListTeam/OpenList-Worker&install-command=pnpm%20install%20--no-frozen-lockfile&build-command=pnpm%20run%20build&output-directory=dist&env=JWT_SECRET) | [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/OpenListTeam/OpenList-Worker) |
+- **后端由 Go 重写为 TypeScript**，运行在边缘计算与 Serverless 运行时上，而不是传统常驻进程；
+- **前端保持与官方一致的界面与交互**，复用官方前端产物；
+- **同一套后端代码可部署到多个平台**：Cloudflare Workers、腾讯云 EdgeOne Makers、阿里云 ESA、Vercel Serverless，以及 Node.js 容器环境。
 
-</div>
+目标是让「聚合几十种网盘」这件事尽可能零运维：无需自己维护服务器、进程与反向代理。
 
-> [!IMPORTANT]
-> - 若Cloudflare提示`无法获取存储库内容`，则您需要先[Fork](https://github.com/OpenListTeam/OpenList-Worker/fork)本项目，再通过连接到Github仓库功能部署
-> - 部署完成后配置环境变量： **EdgeOne**：[国际站](https://console.edgeone.ai/makers) · [中国站](https://console.cloud.tencent.com/edgeone/makers)；**Cloudflare**：[Worker 后台](https://dash.cloudflare.com/)，环境变量：
->   - `DB_FORMAT`: 数据存储格式：`map` (默认，整对象JSON) / `key` (分key存储) / `sql` (关系表，与Go后端一致)
->   - `DB_DRIVER`: 数据库驱动：`auto` (默认，自动检测) / `blob` (EdgeOne Blob) / `vblob` (Vercel Blob) / `cfkv` (CF KV API) / `kv` (KV binding) / `d1` (Cloudflare D1) / `mysql` / `postgres` (Neon / Vercel Postgres)
->   - 其余可选变量参考**详细部署指南**：[Cloudflare](https://doc.oplist.org/guide/installation/worker#deploy-to-cloudflare-workers) · [EdgeOne](https://doc.oplist.org/guide/installation/worker#deploy-to-edgeone) · [ESA](https://doc.oplist.org/guide/installation/worker#deploy-to-alibaba-cloud-esa)
+### 设计目标
 
+- **边缘优先、无服务器**：以请求驱动的方式运行，天然适应冷启动、多实例并发。
+- **一套代码、多平台**：抽象出统一入口与存储适配层，部署形态由环境决定。
+- **数据可移植**：提供多种存储格式，其中关系表格式与 Go 后端完全同构，可与 Go 版共享同一物理数据库。
+- **显式优于隐式**：显式指定的驱动/格式若不可用，直接报错并给出可操作原因，不静默回退到其它后端，避免「以为在用 A、实际写进了 B」。
+- **安全默认**：JWT 会话、CSRF 防护、点击劫持防护、内容安全策略，以及可插拔的敏感字段落盘加密。
 
-## 功能简介
+### 整体架构
 
-OpenList 是一个运行于边缘计算平台的多存储聚合文件列表与管理系统，可将分散在不同网盘、对象存储与协议服务中的文件统一到一个界面，进行浏览、预览、下载与管理。
+```mermaid
+graph TD
+    A["入口层：api 路由 / worker.ts / esa-entry.ts / handler.ts / middleware.js"] --> B["应用层：Hono 应用 src/backend/index.ts"]
+    B --> C["路由与接口：server/"]
+    C --> D["业务逻辑：internal/"]
+    D --> E["存储驱动：drivers/（78 个）"]
+    C --> F["持久化：internal/model/store"]
+    F --> G["存储后端：vblob / postgres / kv / d1 / cfkv / blob / do / mysql / memory"]
+    C --> H["基础工具：pkg/"]
+```
 
-OpenList-Worker 是官方 [OpenListTeam/OpenList](https://github.com/OpenListTeam/OpenList) 项目的 TypeScript + Serverless 移植版，后端由 Go 重写为运行于 Workers 的 TypeScript 服务，前端保持一致的界面与交互体验。
+- **入口层**：`api/[...route].ts`（Vercel / EdgeOne Node Serverless）、`src/backend/worker.ts`（Cloudflare Workers）、`esa-entry.ts`（阿里云 ESA）、`handler.ts`（通用 Serverless / Node）、根级 `middleware.js`（EdgeOne 边缘中间件），最终都收敛到同一个 Hono 应用。
+- **应用层**：`src/backend/index.ts` 装配 Hono、合并运行时环境变量、挂载全部后端路由，并提供 SPA 回退壳，保证前端深链可用。
+- **路由与接口层**（`src/backend/server/`）：按领域拆分的 HTTP 接口与中间件，涵盖鉴权与账户（`auth` / `sso` / `ldap` / `public`）、文件与共享（`fs` / `raw` / `share` / `task`）、管理（`admin`）、对外协议（`webdav` / `s3` / `mcp`）、代理与静态资源（`proxy_request` / `assets`）等。
+- **业务内部层**（`src/backend/internal/`）：与 HTTP 无关的领域逻辑，包括 `driver`、`model`、`op`、`stream`、`upload`、`webdav`、`mcp`、`archive`、`seed`。
+- **基础工具层**（`src/backend/pkg/`）：`crypto` / `legacy-ciphers` / `chacha20`、`csrf`、`totp`、`password`、`permission`、`path`、`sign`、`xml`、`stream`、`http`、`errs`、`audit`、`secure-log` 等。
 
-### 存储聚合
+### 存储与持久化
 
-内置 **78 个存储驱动**，开箱即用地挂载各类存储后端：
+- **存储格式（`DB_FORMAT`）**：`map`（整对象 JSON，适合 KV / Blob）、`key`（按实体拆分为多条记录）、`sql`（关系表，表结构与命名与 Go 后端一致，如 `x_storages` / `x_users`，可与 Go 版共享数据库）。
+- **存储驱动（`DB_DRIVER`）**：EdgeOne Blob、ESA Blob、Vercel Blob（`vblob`）、Cloudflare KV（binding 与 REST API）、Cloudflare D1、Cloudflare Durable Objects、MySQL / MariaDB、PostgreSQL（含 Vercel Marketplace / Neon 的 HTTP 驱动），以及仅用于降级的 memory。默认 `auto` 按固定优先级探测；显式指定驱动时不回退。
+- **敏感字段加密（`DB_CIPHER`）**：默认 `none`，可启用 AES-256-GCM、ChaCha20-Poly1305、AES-CBC-HMAC 等。密文带版本前缀（`enc:v1:` ~ `enc:v6:`），读取时按前缀自动识别算法，因此切换算法或关闭加密都不会使既有数据不可读，并在下次保存时逐字段迁移。
 
-- **国内网盘**：阿里云盘（开放平台/分享）、夸克网盘（开放平台/UC TV 版）、百度网盘（相册）、115 网盘（开放平台/分享）、123 云盘（开放平台/分享）、天翼云盘（189/PC/TV）、中国移动云盘（139/和彩云）、沃家云盘、迅雷云盘、腾讯微云、蓝奏云、PikPak（分享）、豆包网盘、光亚盘、超星小组网盘、联想 NAS 分享、Teambition 网盘、WPS 网盘、阿里文档、HalalCloud、MediaTrack 等
-- **国际网盘**：Google Drive（相册）、OneDrive（应用/分享链接）、Dropbox、MEGA、MediaFire、Proton Drive、Yandex Disk、Degoo、Bunny Storage、TeraBox 等
-- **对象存储**：S3 兼容（AWS/OSS/COS/MinIO 等）、又拍云 USS、Azure Blob、WebDAV、FTP、SFTP、SMB、IPFS 等
-- **代码托管**：GitHub、GitHub Releases、CNB Releases
-- **网盘程序**：OpenList（分享）、AList V3、Cloudreve V3/V4、Kodbox（可道云）、Seafile、Teldrive、Febbox 等
-- **其他驱动**：网易云音乐、Misskey、Emby、Cloudflare 图床等
+### 存储驱动生态
 
-除上述真实存储外，还提供 `Local`、`Alias`、`UrlTree`、`AutoIndex`、`Strm`、`Crypt`、`Virtual`、`Chunk` 等虚拟/功能型驱动，可用于本地挂载、地址别名、URL 列表、加密存储与分片等场景。
+内置 **78 个存储驱动**，覆盖主流网盘、对象存储、协议服务与网盘程序；另提供 `Local`、`Alias`、`UrlTree`、`AutoIndex`、`Strm`、`Crypt`、`Virtual`、`Chunk` 等虚拟 / 功能型驱动。驱动之间通过统一接口对接上层文件操作，新增驱动只需实现该接口并登记到注册表。
 
 ### 核心能力
 
-- **文件浏览**：统一的目录树浏览，支持图片、视频、音频、文档、代码、压缩包等格式在线预览。
-- **上传下载**：跨存储的上传、批量下载、流式传输与直链跳转。
-- **文件分享**：生成带有效期、密码与权限控制的分享链接，支持匿名访问与目录分享。
-- **全文搜索**：在已索引的存储中快速检索文件。
-- **离线任务**：后台任务队列，支持批量操作与异步处理。
-- **外部接口**：将聚合存储以 WebDAV 或 S3 兼容协议对外暴露，便于挂载到第三方工具。
-- **MCP 服务**：提供 Model Context Protocol 端点，可被 AI 助手等客户端集成调用。
+- **文件浏览与预览**：统一目录树，支持图片、视频、音频、文档、代码、压缩包等在线预览。
+- **上传与下载**：跨存储上传、批量下载、流式传输与直链跳转。
+- **文件分享**：带有效期、密码与权限控制的分享链接，支持匿名访问与目录分享。
+- **搜索**：在已索引存储中检索文件。
+- **离线任务**：后台任务队列，支持批量与异步处理。
+- **对外协议**：`WebDAV` 与 S3 兼容端点，便于挂载到第三方工具。
+- **MCP 服务**：提供 Model Context Protocol 端点，可被 AI 助手等客户端集成。
 
-### 权限管理
+### 权限与安全
 
-- **权限管理**：基于角色的访问控制（RBAC），支持用户分组、目录级读写权限与配额。
-- **认证方式**：内置账号密码，支持TOTP验证、WebAuthn/FIDO登录、SSO单点登录与 LDAP 目录认证。
-- **安全加固**：JWT 会话、CSRF 防护、点击劫持防护（X-Frame-Options）、内容安全策略（CSP）。
-- **健康检查**：提供 `/health` 存活探针与 `/healthz` 就绪探针，可用于监控与告警。
-
-### 平台部署
-
-- **运行平台**：Cloudflare Workers、腾讯云 EdgeOne Makers、Vercel、Serverless  及 Node.js 容器环境。
-- **数据存储**：Cloudflare D1（SQLite）为主，同时支持 MySQL、MariaDB、PostgreSQL、SQL Server。
-- **持久缓存**：Cloudflare KV / EdgeOne Blob（可选），用于配置持久化与缓存。
-- **一键部署**：支持 EdgeOne、Cloudflare Workers 等平台的一键部署按钮+初始化。
-
----
-
-## 手动部署
-
-### 前置要求
-
-- Node.js 18+（推荐使用 pnpm）
-- Cloudflare 账号（用于部署到 Workers）
-
-### 本地开发
-
-```bash
-# 1. 安装依赖
-pnpm install
-
-# 2. 编辑 wrangler.jsonc / .env，配置 JWT_SECRET 与存储（KV/D1 在控制台绑定）
-
-# 3. 启动开发服务器（自动拉取官方前端并运行 Worker）
-pnpm run dev:unified
-
-# 或仅运行 Worker（不拉取前端）
-pnpm run dev:worker
-```
-
-### 生产部署
-
-```bash
-# 一键部署：确保 KV namespace 存在 → 拉取官方前端 → 部署到 Cloudflare Workers
-pnpm run deploy
-
-# 或直接部署 Worker（跳过 KV 检查与前端构建）
-pnpm run deploy:worker
-```
-
-### Vercel 部署（Hobby）
-
-入口为 `api/[...route].ts`（Node Serverless Runtime），路由、Cron 与函数规格见
-`vercel.json`。持久化使用 Vercel 平台自带存储（二选一或都连，`DB_DRIVER=auto`
-会自动挑选）：
-
-1. 导入仓库，Framework Preset 选 **Other**，Build Command / Output Directory 保持默认。
-2. 在 **Storage** 中创建 **Blob** 商店并连接项目（自动注入 `BLOB_READ_WRITE_TOKEN`），
-   或创建 **Postgres / Neon** 数据库并连接项目（自动注入 `POSTGRES_URL` / `DATABASE_URL`）。
-3. 环境变量（可选但推荐）：
-   - `DB_DRIVER` / `DB_FORMAT`：显式指定驱动与格式（如 `postgres` + `sql`）
-   - `JWT_SECRET`：不设置时安装向导会生成并持久化到已连接的存储
-   - `CRON_SECRET`：Vercel Cron 鉴权（启用定时任务时必填；Vercel 以
-     `Authorization: Bearer <CRON_SECRET>` 发起请求，未设置时该请求会被拒绝）
-
-> Hobby 版 Cron 每天最多触发 1 次，`vercel.json` 已配置 `/api/task/refresh`。
-> Serverless 函数对请求/响应体有上限，代理大文件会自动降级为 302 直链
-> （默认 4 MiB，可用 `RAW_PROXY_MAX_BYTES` 覆盖，`0` 表示不限制）。
-
-#### 命令行部署（CLI）
-
-Git 集成之外也可用 Vercel CLI 发布。有两处与源码约定相关的构建处理必须执行：
-
-```bash
-# 关联项目（首次）
-vercel link --project openlist-tsworker
-
-# 拉取生产环境变量（写入 .vercel/，已被 .gitignore 忽略）
-vercel pull --yes --environment=production
-
-# 平台侧构建，产出 .vercel/output
-vercel build --prod
-
-# 打包并注入函数入口（必需，见下方说明）
-node scripts/vercel-bundle.mjs
-
-# 以预构建产物部署
-vercel deploy --prebuilt --prod
-```
-
-- **函数 entry**：`@vercel/node` 只做逐文件转译、不做打包，而本项目源码使用
-  无扩展名 ESM 相对导入（TS 风格），转译产物在 Node ESM 下无法解析，运行时会
-  报 `ERR_MODULE_NOT_FOUND`。`scripts/vercel-bundle.mjs` 用 esbuild 以 Node 目标
-  把 `api/[...route].ts` 打成自包含 bundle 覆盖函数入口，务必在部署前执行。
-- **根目录 `middleware.js`** 是 EdgeOne Makers 中间件（签名 `middleware(context)`），
-  已由 `.vercelignore` 排除；否则 Vercel 会把它当作 Edge Middleware 匹配全部路由，
-  导致整站 500。
-- **SPA 回退**：`vercel.json` 的负向断言 rewrite 目标为 `/`。在 `cleanUrls` 下
-  `/index.html` 会被 308 到 `/`，若目标写成 `/index.html` 会使深链（如 `/add`）
-  判定落空而 404。
-
----
-
-## 技术架构
-
-### 后端
-
-- **运行环境**：Cloudflare Workers（Edge Computing）
-- **Web 框架**：Hono.js
-- **数据库**：Cloudflare D1（SQLite）/ 支持 MySQL、MariaDB、PostgreSQL、SQL Server
-- **缓存**：Cloudflare KV（可选）
-- **语言**：TypeScript
-- **构建工具**：Wrangler、esbuild
+- **访问控制**：基于角色的 RBAC，支持用户分组、目录级读写权限与配额。
+- **认证方式**：内置账号密码，支持 TOTP 二次验证、WebAuthn/FIDO 登录、SSO 单点登录与 LDAP 目录认证。
+- **加固项**：JWT 会话、CSRF 防护、点击劫持防护（`X-Frame-Options`）、内容安全策略（CSP）。
+- **可观测性**：`/health` 存活探针与 `/healthz` 就绪探针；就绪探针基于实际生效的存储驱动判断持久化是否可用。
 
 ### 前端
 
-- **框架**：React 19 + TypeScript
-- **UI 库**：Ant Design / Material-UI
-- **构建工具**：Vite
+- **框架**：React 19 + TypeScript；**UI**：Ant Design / Material-UI；**构建**：Vite。
+- **形态**：单页应用，配合后端 SPA 回退，保证前端路由深链可用。
+
+### 多平台部署形态
+
+后端不绑定单一平台，同一套代码以不同入口适配多种运行环境：Cloudflare Workers（原生 `fetch`，使用 D1 / KV 等绑定）、腾讯云 EdgeOne Makers（Node Serverless + 根级边缘中间件）、阿里云 ESA（专用入口）、Vercel Serverless（Node Runtime，使用平台自带 Blob / Postgres 持久化）、以及 Serverless / Node.js 容器。
 
 ---
 
+## 如何修改
 
-## 配置
+### 目录结构
 
-### 环境变量
+- `src/backend/server/`：HTTP 路由与中间件（鉴权、文件、分享、管理、WebDAV / S3 / MCP 等）。
+- `src/backend/drivers/`：78 个存储驱动，每个驱动一个子目录。
+- `src/backend/internal/`：领域逻辑与存储层（`model/store` 为持久化抽象、格式与后端驱动）。
+- `src/backend/pkg/`：加密、签名、权限、路径、XML、流等基础工具。
+- `api/`、`src/backend/worker.ts`、`esa-entry.ts`、`handler.ts`：各平台入口。
+- `scripts/`：构建与部署脚本。
 
-#### 数据库配置
+### 常用命令
 
-**DB_FORMAT**（数据存储格式）
-- `map`（默认）：整对象 JSON 格式，适用于 KV/Blob 等简单存储
-- `key`：分 key 存储格式，每个实体一条记录（如 `users_1`），避免大 JSON
-- `sql`：关系数据库表格式，与 Go 后端完全一致，适用于 D1/MySQL
-
-**DB_DRIVER**（数据库驱动）
-- `auto`（默认）：自动检测可用驱动（优先级：postgres → mysql → d1 → kv → cfkv → vblob → blob → do）
-- `blob`：EdgeOne Blob Storage（SDK）/ ESA Blob（binding）
-- `vblob`：Vercel Blob（需配置 `BLOB_READ_WRITE_TOKEN`，连接 Blob 商店后由 Vercel 注入）
-- `cfkv`：Cloudflare KV REST API（需配置 `CF_ACCOUNT`、`CF_KV_UUID`、`CF_API_KEY`）
-- `kv`：KV 存储（binding 名固定为 `KV`；EdgeOne Node 云函数自动走 HTTP 代理模式）
-- `d1`：Cloudflare D1（SQLite）
-- `do`：Cloudflare Durable Objects（SQLite）
-- `mysql`：MySQL（仅 Node.js 容器）
-- `postgres`：Postgres / Neon（Vercel Marketplace Postgres；URL 取自 `POSTGRES_URL` / `DATABASE_URL` 等）
-
-**DB_CIPHER**（敏感字段落盘算法，**默认不加密**）
-- `none`（默认）：不加密，敏感字段与普通 JSON 一样明文落盘
-- `aes-256-gcm`：HKDF-SHA256 派生一把 AES-256-GCM 密钥（`enc:v2:`）
-  —— 既有加密部署写入的形态，开销最低，开启加密时**推荐**
-- `aes-256-gcm-pbkdf2`：AES-256-GCM，密钥由 PBKDF2-SHA256（10 万次迭代）逐字段派生
-  （历史 `enc:v1:` envelope，抗弱口令但每次读写都很慢，仅建议用于兼容）
-- `aes-256-cbc-hmac`：AES-256-CBC + HMAC-SHA256（`enc:v3:`，Encrypt-then-MAC）
-- `chacha20-poly1305`：ChaCha20-Poly1305（`enc:v4:`，RFC 8439，纯 JS 实现；
-  WebCrypto 全平台都没有 ChaCha20，故自带实现并通过 RFC 官方向量验证）
-- `des-cbc-hmac` / `3des-cbc-hmac`：DES / 3DES-CBC + HMAC-SHA256（`enc:v5:` / `enc:v6:`）
-  —— **仅用于兼容/互操作**：单 DES 有效密钥只有 56-bit（可被暴力破解），3DES 已被
-  NIST SP 800-131A 弃用（64-bit 分组 + Sweet32）。选用时后端会打印一次性告警，
-  请勿用它们保护真实数据。
-- 别名（大小写无关）：`gcm`/`hkdf`/`v2`、`pbkdf2`/`v1`、`cbc`/`v3`、`chacha20`/`v4`、
-  `des`/`v5`、`3des`/`tripledes`/`v6`、`off`/`plain`；无法识别时告警并回退 `none`
-
-**几种算法的 CPU 特性（实测，120 字节字段，Node 22）**
-
-| 算法 | 单字段耗时 | 说明 |
-| :-- | --: | :-- |
-| `aes-256-gcm` | ~30 µs | WebCrypto 原生（调用开销为主） |
-| `chacha20-poly1305` | ~18 µs | 纯 JS，小字段下反而更快 |
-| `aes-256-cbc-hmac` | ~60 µs | 两次 WebCrypto 调用（加密 + HMAC） |
-| `des-cbc-hmac` / `3des-cbc-hmac` | ~0.26 ms | 纯 JS（crypto-js） |
-| `aes-256-gcm-pbkdf2` | ~27 ms | 每字段 10 万次 PBKDF2（历史包袱） |
-
-为此后端内置两项优化（对功能无影响）：① 密钥派生结果在**进程内缓存**，同一
-isolate 只派生一次；② **未变化字段跳过重新加密** —— 明文、算法、密钥都没变时
-直接复用上次的密文，因此「改一个设置」不会触发全库重新加密（对 PBKDF2/DES
-这类昂贵算法尤为明显）。
-
-**推荐配置组合：**
 ```bash
-# Cloudflare Workers + D1（推荐）
-DB_FORMAT=sql        # 也可用 map / key
-DB_DRIVER=d1         # 需在 wrangler.jsonc 的 d1_databases 里绑定名为 DB
+# 安装依赖
+pnpm install
 
-# EdgeOne + Blob（推荐，零配置）
-DB_FORMAT=map        # 或 key
-DB_DRIVER=blob
+# 本地开发：拉取官方前端并启动 Worker
+pnpm run dev:unified
 
-# Cloudflare Workers + KV（必须先绑定 KV，见下方【方案 A】）
-DB_FORMAT=map        # 或 key
-DB_DRIVER=kv         # 需打开 wrangler.jsonc 的 kv_namespaces，绑定名必须恰好是 KV；
-                     # 未绑定却显式写 kv 会直接报错（不做回退）
+# 仅运行后端 Worker（不拉取前端）
+pnpm run dev:worker
 
-# EdgeOne Node 云函数 + KV（还需额外部署 Edge Function 代理）
-DB_FORMAT=map        # 或 key
-DB_DRIVER=kv
-EO_KV_URLS=https://<你的部署域名>   # 代理地址（也可由请求 origin 自动注入）
-JWT_SECRET=<32 字符以上>           # 代理鉴权，需与 Edge Function 侧一致
+# 类型检查
+pnpm lint
 
-# 远程访问 Cloudflare KV（HTTP API，无需 binding）
-DB_FORMAT=key
-DB_DRIVER=cfkv
-CF_ACCOUNT=your_account_id
-CF_KV_UUID=your_namespace_id
-CF_API_KEY=your_api_token
-
-# Vercel + Blob（Hobby 免费额度可用）
-DB_FORMAT=map        # 或 key
-DB_DRIVER=vblob      # 连接 Blob 商店后由 Vercel 注入 BLOB_READ_WRITE_TOKEN
-
-# Vercel + Postgres / Neon（推荐：可用 sql 列式表，与 Go 后端共享）
-DB_FORMAT=sql        # 也可用 map / key
-DB_DRIVER=postgres   # 连接 Postgres 后由 Vercel 注入 POSTGRES_URL / DATABASE_URL 等
-CRON_SECRET=<随机串> # 启用 Vercel Cron 时必填：Vercel 以 Authorization: Bearer <CRON_SECRET> 调用 /api/task/refresh
+# 分模块测试
+pnpm run test:drivers
+pnpm run test:server
+pnpm run test:store
+pnpm run test:model
 ```
 
-> 不确定用哪个就保持 `DB_DRIVER=auto`（默认，自动探测）。
-> 显式指定驱动时**不做回退**：该驱动不可用会直接拒绝请求并给出可操作原因（含
-> 「自动探测会选哪个驱动」，照抄即可），`/api/public/env_check` 与
-> `/api/public/init_status` 也会显示同样的原因和一行修复建议，
-> 避免「以为在用 KV、实际写进了别的后端」。
-> 非法「驱动 × 格式」组合（如 `DB_FORMAT=sql` + `DB_DRIVER=kv`）同样只报错，
-> 不会自动改驱动或格式。
+### 修改代码后如何构建
 
-**关于 DB_CIPHER 的补充说明：**
-- 加密只作用于 `storages[].addition`（网盘凭据）、敏感 `settings`、`users[].password`、
-  `users[].otp_secret`；内存中始终为明文，其余逻辑（驱动、路径解析、管理接口）不受影响。
-- **`none` 只表示「不加密数据库字段」，不影响其它任何行为**：JWT 令牌签名仍需一把
-  跨实例/跨冷启动一致的共享密钥，若未通过环境变量 `JWT_SECRET` 提供，安装向导仍会
-  自动生成并持久化 `openlist_encryption_secret`（与加密是否启用无关）。
-- 密文带版本前缀（`enc:v1:` ~ `enc:v6:`），**读取时按前缀自动识别算法**，
-  与当前配置无关。因此：
-  - 从加密切回 `none`（或升级后不再配置 `DB_CIPHER`）：既有密文仍能正常解密，
-    并在**下一次配置保存**时自动转为明文（逐字段迁移，无需任何手动步骤）；
-  - 更换算法：既有密文按旧算法解开，下次写入按新算法落盘；
-  - 既有的明文数据（无前缀）原样返回，升级不会丢数据。
-- 加密算法选择是**正交的一维**，不改变 `DB_DRIVER` / `DB_FORMAT` 的语义。
-- 取值无法识别时回退 `none` 并在日志告警（不会静默启用某个算法）；
-  `/api/public/env_check` 的 `config.db_cipher` 会回显当前生效值。
-- AES 三种算法基于 WebCrypto（各平台原生）；`chacha20-poly1305` 与 `des/3des` 因
-  WebCrypto 不提供对应算法而使用纯 JS 实现 —— 全部在 Cloudflare Workers /
-  EdgeOne Node 云函数 / ESA / Node.js 上行为一致（不依赖 `node:crypto`）。
+```bash
+# 拉取官方前端并产出各平台构建产物
+pnpm build
+```
 
-**向后兼容：**
-- `DB_DRIVER=json` 自动转换为 `DB_FORMAT=map` + 自动检测驱动
-- 未配置 `DB_CIPHER` 时**不再对敏感字段加密**（旧版本默认加密）。升级已有部署时：
-  存储中的 `enc:v1:`（PBKDF2）与 `enc:v2:`（HKDF）密文仍会按前缀自动解密、保持可读，
-  并在**下一次配置保存**时自动转为明文；如需继续加密，显式设置 `DB_CIPHER` 即可
-  （`DB_CIPHER=aes-256-gcm` 与既有加密部署的写入形态一致）。
+`pnpm build` 由两个脚本组成：`scripts/fetch-frontend.mjs`（拉取官方前端）与 `scripts/build-edge.mjs`（产出各平台所需产物）。若部署到 Vercel，还需在部署前额外执行 `node scripts/vercel-bundle.mjs` 打包并注入函数入口。
 
-**表名对齐（仅 SQL 格式）：**
-`sql` 格式采用列式表，命名策略与 Go 后端的 GORM 一致（snake_case + 复数表名 + 前缀）：
+### 推送到自己的仓库
 
-| Go 结构体     | 表名                |
-| :------------ | :------------------ |
-| `SettingItem` | `x_setting_items`   |
-| `SharingDB`   | `x_sharing_dbs`     |
-| `Storage`     | `x_storages`        |
-| `User`        | `x_users`           |
-| `Meta`        | `x_metas`           |
-| （仅 TS）     | `x_plugins`         |
+```bash
+# 添加上游与你自己的远端
+git remote add jinzhenyi https://github.com/<你的用户名>/OpenList-Worker.git
 
-前缀固定为 `x_`（与 Go 后端默认值一致）。要与 Go 后端共享同一物理数据库，无需额外配置。
+# 提交改动并推送
+git add .
+git commit -m "feat: your change"
+git push jinzhenyi main
+```
 
-#### 安全配置
+推送后，若项目已与 Vercel / Cloudflare 等平台绑定 Git 集成，平台会自动构建部署；也可用各平台 CLI 发布，Vercel 的预构建流程为：
 
-- `JWT_SECRET`：JWT 令牌签名密钥（必填），**同时用作可选的字段加密密钥**与定时任务鉴权
-- `DB_CIPHER`：敏感字段落盘算法（可选，默认 `none` 不加密）：`none` / `aes-256-gcm`
-  （推荐）/ `aes-256-gcm-pbkdf2` / `aes-256-cbc-hmac` / `chacha20-poly1305` /
-  `des-cbc-hmac` / `3des-cbc-hmac`（后两者仅兼容用途，不安全）
-- `ADMIN_PASS`：初始管理员密码（可选，设置后跳过安装向导自动初始化 admin）
+```bash
+vercel build --prod
+node scripts/vercel-bundle.mjs
+vercel deploy --prebuilt --prod
+```
 
-#### 其他配置
+### 修改站点配置
 
-详细配置说明请参考 [官方文档](https://doc.oplist.org/guide/configuration)
+运行配置通过环境变量提供，示例与说明见 [`.env.example`](./.env.example)。常用项：
+
+- `DB_DRIVER` / `DB_FORMAT`：存储驱动与格式（如 `vblob` + `map`、`postgres` + `sql`）。
+- `DB_CIPHER`：敏感字段落盘加密算法（默认 `none`，推荐 `aes-256-gcm`）。
+- `JWT_SECRET`：会话签名密钥，同时作为字段加密的密钥派生材料；启用加密后请勿随意更换。
+- `CRON_SECRET`：定时任务端点鉴权密钥。
+
+> 注意：加密密钥由 `JWT_SECRET` 派生。启用 `DB_CIPHER` 后若更换 `JWT_SECRET`，已加密字段将无法解密；如需更换，先设 `DB_CIPHER=none` 并保存一次完成明文迁移。
 
 ---
-
-
-## 帮助支持
-
-在使用过程中遇到问题，可通过以下渠道获取帮助：
-
-- 🐛 **提交 Bug 或功能请求**：请前往 [_Issues_](https://github.com/OpenListTeam/OpenList-Worker/issues)
-- 💬 **一般性问题与交流**：请前往 [_Discussions_](https://github.com/OpenListTeam/OpenList/discussions) 讨论区
 
 ## 开源许可
 
 `OpenList` 是基于 [AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.txt) 许可证的开源软件。
-
-
-## 联系我们
-
-🌐 [@GitHub](https://github.com/OpenListTeam) · ✈️ [Telegram 交流群](https://t.me/OpenListTeam) · ✈️ [Telegram 频道](https://t.me/OpenListOfficial)
 
 ## 贡献列表
 
