@@ -31,7 +31,7 @@ This file records user instructions, preferences, and project knowledge for refe
 - Context: Discovered by Agent while deploying to Vercel and diagnosing storage/health issues
 - Category: Operations & Deployment
 - Instructions:
-  - 线上部署：Vercel 项目名 `openlist-tsworker`（projectId `prj_r9Sxfgkd271TC6rh2L6wrEx6w61e`，team/scope `jzy-s-projects`，teamId `team_tHnllturntg1DoEvEJsshWBz`），生产域名 `https://openlist-tsworker.vercel.app`。项目已按品牌改名为 Storlane（仓库 `jinzhenyi/Storlane`），Vercel 项目名/域名是否同步改名见下方最新条目。
+  - 线上部署：Vercel 项目名 `openlist-tsworker`（projectId `prj_r9Sxfgkd271TC6rh2L6wrEx6w61e`，team/scope `jzy-s-projects`，teamId `team_tHnllturntg1DoEvEJsshWBz`），生产域名 `https://openlist-tsworker.vercel.app`。仓库已按品牌改名为 `jinzhenyi/Storlane`；Vercel 项目名/域名尚未改名（重命名需 dashboard 操作或新 token，见 2026-09-29 条目）。
   - 部署流程（CLI）：`vercel build --prod` → `node scripts/vercel-bundle.mjs` → `vercel deploy --prebuilt --prod --token "$VERCEL_TOKEN"`。`vercel deploy` 必须显式传 `--token`。
   - Vercel CLI 的 `whoami` / `env ls` / `env pull` 在本 token 下会失败（`User not found.` / `Could not retrieve Project Settings`），但 REST API（`/v9` 或 `/v10/projects/{id}/env?teamId=...`）可用，环境变量应通过 API 管理。
   - 运行时有效配置可用 `GET /api/public/env_check` 反推；当前为 `DB_DRIVER=vblob`（Vercel Blob，`DB_FORMAT=map`）、`DB_CIPHER=aes-256-gcm`、`CRON_SECRET`（Cron 鉴权，未带 Bearer 访问 `/api/task/refresh` 返回 401）。
@@ -56,3 +56,8 @@ This file records user instructions, preferences, and project knowledge for refe
   - **禁止改名的硬兼容项（改了就破坏既有数据/协议）**：`src/backend/pkg/crypto.ts` 中的 KDF info/salt 字符串（`openlist-config-encryption-*`、`openlist-db-cipher-*`）；种子格式 `SEED_FORMAT="openlist-sharing-seed"` 与 bencode 键 `x-openlist`；挂载驱动 id `openlist` / `openlist_share`（`DriverOpenlist*`、`ClientOpenlist*`、`OpenListShare`）；种子来源类型 `openlist-share` / `openlist-direct`；为通过第三方网盘校验而伪装的 UA（如 `... OpenList/425.6.30`、`... openlist-client`）。
   - 品牌相关的第三方常量：`api.oplist.org`（百度/夸克等驱动的在线刷新 API）与 `doc.oplist.org`（上游文档链接）为上游真实服务/文档，保留。
   - 前端构建脚本 `scripts/fetch-frontend.mjs` 已指向 fork `jinzhenyi/Storlane-Frontend`；构建期 `stampFrontendVersion` 的包名匹配放宽为 `/(storlane-frontend|openlist-frontend)/i` 以兼容新旧产物。
+  - 前端 fork 改名要点：全局配置全局量 `window.OPENLIST_CONFIG` → `window.STORLANE_CONFIG`；构建环境变量 `OPENLIST_FRONTEND_BUILD_*` → `STORLANE_FRONTEND_BUILD_*`；产物名 `openlist-frontend-dist-*` → `storlane-frontend-dist-*`；repo 内新增自绘 `public/logo.svg` 并替换 `res.oplist.org` 引用。前端 **必须保留** 的兼容标识：驱动 id `OpenList` / `OpenListShare`、API 参数 `openlist_ts`、插件清单 `openlist-plugin.json`、全局 `window.OpenListPlugin`、GitHub 依赖 `OpenListTeam/hope-ui` 与 `OpenListTeam/mpegts.js`（含 `pnpm-workspace.yaml` 的 codeload 引用）。
+  - 后端品牌 logo 统一为自有资源 `https://raw.githubusercontent.com/jinzhenyi/Storlane-Frontend/main/public/logo.svg`（`src/backend/server/assets.ts` 的 LOGO_URL、`public.ts` 默认 settings、`db.ts` 的 LEGACY_SETTING_MIGRATIONS 迁移目标）；`assets_route.test.ts` 已同步该断言。
+  - `scripts/fetch-frontend.mjs` 默认顺序：优先 npm 已发布 dist（`@storlane-frontend/storlane-frontend`），未发布（404 / 无 dist-tags）时自动回退克隆 `FRONTEND_GIT_URL`（默认 fork）现构建；`FRONTEND_BUILD_FROM_SOURCE=1` 可强制现构建。
+  - 该 fork 的 `.github/workflows/*` 保持上游原样：当前 GitHub PAT 无 `workflow` scope，推送含 workflow 改动的提交会被拒绝（`refusing to allow a Personal Access Token to create or update workflow`）。
+  - Vercel 运维凭据：原存在 `/tmp/opencode/vercel.env` 的 token 已失效（REST `/v2/user` 返回 `User not found.`，所有带 `teamId` 的请求返回 `not authorized ... scope "jzy-s-projects"`）；需用户提供新 token 或 dashboard 手动改项目名后才能继续 Vercel 侧改名/重新部署。
