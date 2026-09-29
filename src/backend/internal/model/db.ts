@@ -924,6 +924,11 @@ export function setEnvCtx(env: any) {
 const STORLANE_LOGO_URL =
   "https://raw.githubusercontent.com/jinzhenyi/Storlane-Frontend/main/public/logo.svg"
 const LEGACY_SETTING_MIGRATIONS: Record<string, { from: any[]; to: string }> = {
+  // 品牌改名：把仍为上游默认名的站点标题迁移为 Storlane（自定义标题不受影响）。
+  site_title: {
+    from: ["OpenList", "AList", "Alist", "openlist", "alist"],
+    to: "Storlane",
+  },
   logo: {
     from: [
       "",
