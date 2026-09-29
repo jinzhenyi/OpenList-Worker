@@ -31,9 +31,13 @@ This file records user instructions, preferences, and project knowledge for refe
 - Context: Discovered by Agent while deploying to Vercel and diagnosing storage/health issues
 - Category: Operations & Deployment
 - Instructions:
-  - 线上部署：Vercel 项目名 `openlist-tsworker`（projectId `prj_r9Sxfgkd271TC6rh2L6wrEx6w61e`，team/scope `jzy-s-projects`，teamId `team_tHnllturntg1DoEvEJsshWBz`），生产域名 `https://openlist-tsworker.vercel.app`。仓库已按品牌改名为 `jinzhenyi/Storlane`；Vercel 项目名/域名尚未改名（重命名需 dashboard 操作或新 token，见 2026-09-29 条目）。
-  - 部署流程（CLI）：`vercel build --prod` → `node scripts/vercel-bundle.mjs` → `vercel deploy --prebuilt --prod --token "$VERCEL_TOKEN"`。`vercel deploy` 必须显式传 `--token`。
-  - Vercel CLI 的 `whoami` / `env ls` / `env pull` 在本 token 下会失败（`User not found.` / `Could not retrieve Project Settings`），但 REST API（`/v9` 或 `/v10/projects/{id}/env?teamId=...`）可用，环境变量应通过 API 管理。
+  - 线上部署：Vercel 项目已按品牌改名为 **`storlane`**（projectId `prj_r9Sxfgkd271TC6rh2L6wrEx6w61e`，scope `jzy-s-projects`，teamId `team_tHnllturntg1DoEvEJsshWBz`）；生产别名 `https://op.899669.xyz`，部署域名形如 `storlane-<hash>-jzy-s-projects.vercel.app`。仓库 `jinzhenyi/Storlane`。
+  - 部署流程（CLI）：`vercel build --prod --token "$VERCEL_TOKEN"` → `node scripts/vercel-bundle.mjs` → `vercel deploy --prebuilt --prod --token "$VERCEL_TOKEN"`。`vercel deploy` 必须显式传 `--token`。**加速重部署**：若仅改后端，已有 `dist/` 前端产物可复用，先把 `dist` 拷到临时目录，再 `export FRONTEND_DIST=<该目录>` 后执行 `vercel build`（fetch-frontend 命中 `FRONTEND_DIST` 分支，跳过克隆/安装前端，约 18s 完成）。注意 `FRONTEND_DIST` 不能指向 `dist` 本身（`replaceDist` 会先 `rmSync(DEST)` 再复制，自指会丢产物）。
+  - 后台终端 shell 是 `sh`，没有 `source`，加载 token 用 `. /tmp/opencode/vercel.env`。
+  - 构建流水线验证：`pnpm build`（=fetch-frontend + build-edge）中 fetch-frontend 会先查 npm `@storlane-frontend/storlane-frontend`（未发布，404），自动回退克隆 `jinzhenyi/Storlane-Frontend` 并 `npx -y pnpm@11.25.0` 构建，`stampFrontendVersion` 戳入 `4.2.6`；i18n 包因 fork 无 `edge` release 拉取失败，构建产物仅英文（回退 English）。`vercel build` 后必须跑 `scripts/vercel-bundle.mjs` 修复 API 入口 ESM 无扩展名导入，否则函数运行时报 `ERR_MODULE_NOT_FOUND`。
+  - 该 fork 的 `.github/workflows/*` 保持上游原样：当前 GitHub PAT 无 `workflow` scope，推送含 workflow 改动的提交会被拒绝（`refusing to allow a Personal Access Token to create or update workflow`）。
+  - Vercel 运维凭据：token 存 `/tmp/opencode/vercel.env`（`VERCEL_TOKEN`，chmod 600）。新 token 下 `GET /v2/user`、`GET /v2/teams`、`GET /v2/teams/{id}` 会失败（`User not found.` / `You are not authorized`），但**带 `teamId=$TEAM` 的项目级 REST 调用正常**（列项目、改项目名、部署都可用）。
+  - 品牌默认值迁移（`LEGACY_SETTING_MIGRATIONS`）已覆盖：`site_title`（`OpenList`/`AList`/`Alist`/`openlist`/`alist` → `Storlane`，仅当值等于旧默认时才迁移）、`logo`/`favicon` → 自有 logo。线上实例已确认 `site_title` 由 `OpenList` 迁移为 `Storlane`。
   - 运行时有效配置可用 `GET /api/public/env_check` 反推；当前为 `DB_DRIVER=vblob`（Vercel Blob，`DB_FORMAT=map`）、`DB_CIPHER=aes-256-gcm`、`CRON_SECRET`（Cron 鉴权，未带 Bearer 访问 `/api/task/refresh` 返回 401）。
   - 配置项 `DB_CIPHER` 的加密密钥由 `JWT_SECRET` 派生：启用加密后**不可更换 `JWT_SECRET`**，否则已加密字段无法解密；如需更换须先设 `DB_CIPHER=none` 并保存一次完成明文迁移。
   - `DB_DRIVER` / `DB_FORMAT` / `JWT_SECRET` 未显式提供时会取默认值（`auto` / `map` / `无`），`env_check` 的 `db_driver` 字段显示的是配置值（默认 `auto`），据此可判断某变量是否被显式设置。
