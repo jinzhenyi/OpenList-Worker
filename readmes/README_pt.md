@@ -2,7 +2,7 @@
   <img src="https://raw.githubusercontent.com/StorlaneTeam/Logo/main/logo.svg" width="128" height="128" alt="logo" />
 
   <p><em>O Storlane é uma ferramenta de listagem de diretórios rica em recursos que suporta a montagem de dezenas de unidades na nuvem com pré-visualização, download, compartilhamento de arquivos e muito mais</em></p>
-  <p>Este repositório é o port oficial TypeScript + Serverless do projeto <a href="https://github.com/jinzhenyi/Storlane">jinzhenyi/Storlane</a></p>
+  <p>Este repositório é o port oficial TypeScript + Serverless do projeto <a href="https://github.com/OpenListTeam/OpenList">OpenListTeam/OpenList</a></p>
   <p>Executa no Cloudflare Workers / EdgeOne Cloud Function / Alibaba Cloud ESA</p>
 
 <a href="https://github.com/jinzhenyi/Storlane/blob/main/LICENSE"><img src="https://img.shields.io/github/license/jinzhenyi/Storlane" alt="License" /></a>
@@ -21,7 +21,7 @@
 
 Português | [Русский](README_ru.md) | [العربية](README_ar.md) | [Italiano](README_it.md) | [हिन्दी](README_hi.md) | [Español](README_es.md)
 
-[Projeto upstream](https://github.com/jinzhenyi/Storlane) · [Guia de contribuição](https://github.com/jinzhenyi/Storlane/blob/main/CONTRIBUTING.md) · [Código de conduta](https://github.com/jinzhenyi/Storlane/blob/main/CODE_OF_CONDUCT.md) · [Licença](./LICENSE)
+[Projeto upstream](https://github.com/OpenListTeam/OpenList-Worker) · [Guia de contribuição](https://github.com/jinzhenyi/Storlane/blob/main/CONTRIBUTING.md) · [Código de conduta](https://github.com/jinzhenyi/Storlane/blob/main/CODE_OF_CONDUCT.md) · [Licença](./LICENSE)
 
 [🌎 Demo global](https://new.oplist.org) 　|　 [🇨🇳 Demo China](https://new.oplist.org.cn)
 
@@ -53,7 +53,7 @@ Clique no botão abaixo para implantar este projeto na plataforma correspondente
 
 O Storlane é um sistema de listagem e gerenciamento de arquivos multi-armazenamento que roda em plataformas de computação de borda. Ele unifica arquivos dispersos em diferentes unidades na nuvem, armazenamento de objetos e serviços de protocolo em uma única interface para navegar, visualizar, baixar e gerenciar.
 
-O Storlane é o port oficial TypeScript + Serverless do projeto [jinzhenyi/Storlane](https://github.com/jinzhenyi/Storlane). O backend foi reescrito de Go para um serviço TypeScript executado no Workers, enquanto o frontend mantém uma interface e experiência de interação consistentes.
+O Storlane é o port oficial TypeScript + Serverless do projeto [OpenListTeam/OpenList](https://github.com/OpenListTeam/OpenList). O backend foi reescrito de Go para um serviço TypeScript executado no Workers, enquanto o frontend mantém uma interface e experiência de interação consistentes.
 
 ### Agregação de armazenamento
 
@@ -169,7 +169,8 @@ O `Storlane` é um software de código aberto sob a licença [AGPL-3.0](https://
 Obrigado aos seguintes projetos e seus colaboradores:
 
 - O autor e todos os colaboradores de [Alist](https://github.com/AlistGo/alist)
-- O autor e todos os colaboradores de [Storlane](https://github.com/jinzhenyi/Storlane) (versão Go)
+- O autor e todos os colaboradores de [OpenList](https://github.com/OpenListTeam/OpenList) (versão Go)
+- [OpenList-Worker](https://github.com/OpenListTeam/OpenList-Worker) (TypeScript + Serverless 版)
 - Todos os colaboradores deste projeto:
 
 [![Contributors](https://contrib.rocks/image?repo=jinzhenyi/Storlane)](https://github.com/jinzhenyi/Storlane/graphs/contributors)

@@ -2,7 +2,7 @@
   <img src="assets/branding/storlane-logo.svg" width="128" height="128" alt="Storlane logo" />
 
   <p><em>Storlane 是一个多功能的目录列表工具，支持数十种网盘文件挂载和文件预览/下载/分享等功能</em></p>
-  <p>基于官方 <a href="https://github.com/OpenListTeam/OpenList">OpenListTeam/OpenList</a> 的 TypeScript + Serverless 移植版再品牌化而来</p>
+  <p>基于 <a href="https://github.com/OpenListTeam/OpenList">OpenListTeam/OpenList</a>（Go 版）的官方 <a href="https://github.com/OpenListTeam/OpenList-Worker">OpenListTeam/OpenList-Worker</a>（TypeScript + Serverless 版）再品牌化而来</p>
   <p>基于 Cloudflare Workers / EdgeOne Cloud Function / Alibaba Cloud ESA / Vercel Serverless 运行</p>
 
 <a href="https://github.com/jinzhenyi/Storlane/blob/main/LICENSE"><img src="https://img.shields.io/github/license/jinzhenyi/Storlane" alt="License" /></a>
@@ -15,7 +15,7 @@
 
 <div align="center">
 
-[上游项目](https://github.com/OpenListTeam/OpenList) · [贡献指南](https://github.com/jinzhenyi/Storlane/blob/main/CONTRIBUTING.md) · [行为准则](https://github.com/jinzhenyi/Storlane/blob/main/CODE_OF_CONDUCT.md) · [许可证](./LICENSE)
+[上游项目](https://github.com/OpenListTeam/OpenList-Worker) · [贡献指南](https://github.com/jinzhenyi/Storlane/blob/main/CONTRIBUTING.md) · [行为准则](https://github.com/jinzhenyi/Storlane/blob/main/CODE_OF_CONDUCT.md) · [许可证](./LICENSE)
 
 </div>
 
@@ -25,7 +25,7 @@
 
 Storlane 是一个多存储聚合的文件列表与管理系统：把分散在不同网盘、对象存储和协议服务中的文件，统一到一个界面中浏览、预览、下载和管理。
 
-本仓库基于官方 [OpenListTeam/OpenList](https://github.com/OpenListTeam/OpenList)（Go 版）的 **TypeScript + Serverless 移植版**（包名 `storlane`，版本 `4.2.3`）再品牌化而来。其核心差异在于：
+本仓库基于官方 [OpenListTeam/OpenList-Worker](https://github.com/OpenListTeam/OpenList-Worker)（[OpenListTeam/OpenList](https://github.com/OpenListTeam/OpenList) Go 版的 **TypeScript + Serverless 移植版**，包名 `storlane`，版本 `4.2.3`）再品牌化而来。其核心差异在于：
 
 - **后端由 Go 重写为 TypeScript**，运行在边缘计算与 Serverless 运行时上，而不是传统常驻进程；
 - **前端保持与官方一致的界面与交互**，复用官方前端产物；
@@ -175,7 +175,7 @@ vercel deploy --prebuilt --prod
 
 ## 开源许可
 
-`Storlane` 是基于 [AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.txt) 许可证的开源软件，源自并以修改形式使用 `OpenList` / `Alist` 项目。依据许可证要求，本仓库保留 `LICENSE` 与上游版权声明，并在此说明本项目为上游项目的修改版本。
+`Storlane` 是基于 [AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.txt) 许可证的开源软件，源自并以修改形式使用 `OpenList-Worker` / `OpenList` / `Alist` 项目。依据许可证要求，本仓库保留 `LICENSE` 与上游版权声明，并在此说明本项目为上游项目的修改版本。
 
 ## 贡献列表
 
@@ -183,6 +183,7 @@ vercel deploy --prebuilt --prod
 
 - [Alist](https://github.com/AlistGo/alist) 项目作者及全体贡献者
 - [OpenList](https://github.com/OpenListTeam/OpenList)（Go 版）项目作者及全体贡献者
+- [OpenList-Worker](https://github.com/OpenListTeam/OpenList-Worker)（TypeScript + Serverless 版）项目作者及全体贡献者
 - 本项目（Storlane）全体贡献者：
 
 [![Contributors](https://contrib.rocks/image?repo=jinzhenyi/Storlane)](https://github.com/jinzhenyi/Storlane/graphs/contributors)

@@ -52,6 +52,7 @@ This file records user instructions, preferences, and project knowledge for refe
 - Category: Workflow & Collaboration
 - Instructions:
   - 项目已从 OpenList 品牌改名独立为 **Storlane**：包名 `storlane`、仓库 `jinzhenyi/Storlane`、前端仓库 `jinzhenyi/Storlane-Frontend`、KV 配置键 `storlane_config`、密钥槽位 `storlane_jwt_secret` / `storlane_encryption_secret`、DO 类 `StorlaneDB`、错误类 `StorlaneError`。
+  - **上游血缘（勿混淆 Go / JS 两版）**：直接上游是 JS/TS 版 **[OpenListTeam/OpenList-Worker](https://github.com/OpenListTeam/OpenList-Worker)**（本仓库 fork 自它）；**[OpenListTeam/OpenList](https://github.com/OpenListTeam/OpenList)** 是 Go 版、OpenList-Worker 的祖源；`Alist` 为最上游。本地远程布局：`origin` 与 `upstream` 均指向 `OpenListTeam/OpenList-Worker`，`jinzhenyi` 指向自有仓库 `jinzhenyi/Storlane`。README 与 `readmes/*.md` 的“上游项目”“贡献列表”按此更正。
   - **旧键读兼容、写新键（自动迁移）**：`storlane_config` 回退 `openlist_config`（map/key/sql 三种格式各自处理，含 `schema_info` 的初始化标记）、JWT/加密密钥槽位回退旧名、D1 绑定新增 `STORLANE_DB` 别名并保留 `OPENLIST_DB`。
   - **禁止改名的硬兼容项（改了就破坏既有数据/协议）**：`src/backend/pkg/crypto.ts` 中的 KDF info/salt 字符串（`openlist-config-encryption-*`、`openlist-db-cipher-*`）；种子格式 `SEED_FORMAT="openlist-sharing-seed"` 与 bencode 键 `x-openlist`；挂载驱动 id `openlist` / `openlist_share`（`DriverOpenlist*`、`ClientOpenlist*`、`OpenListShare`）；种子来源类型 `openlist-share` / `openlist-direct`；为通过第三方网盘校验而伪装的 UA（如 `... OpenList/425.6.30`、`... openlist-client`）。
   - 品牌相关的第三方常量：`api.oplist.org`（百度/夸克等驱动的在线刷新 API）与 `doc.oplist.org`（上游文档链接）为上游真实服务/文档，保留。

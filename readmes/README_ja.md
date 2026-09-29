@@ -2,7 +2,7 @@
   <img src="https://raw.githubusercontent.com/StorlaneTeam/Logo/main/logo.svg" width="128" height="128" alt="logo" />
 
   <p><em>Storlane は多機能なディレクトリリスティングツールで、数十種類のクラウドドライブのマウントとファイルのプレビュー・ダウンロード・共有などに対応しています</em></p>
-  <p>本リポジトリは公式 <a href="https://github.com/jinzhenyi/Storlane">jinzhenyi/Storlane</a> プロジェクトの TypeScript + Serverless アーキテクチャ移植版です</p>
+  <p>本リポジトリは公式 <a href="https://github.com/OpenListTeam/OpenList">OpenListTeam/OpenList</a> プロジェクトの TypeScript + Serverless アーキテクチャ移植版です</p>
   <p>Cloudflare Workers / EdgeOne Cloud Function / Alibaba Cloud ESA 上で動作します</p>
 
 <a href="https://github.com/jinzhenyi/Storlane/blob/main/LICENSE"><img src="https://img.shields.io/github/license/jinzhenyi/Storlane" alt="License" /></a>
@@ -21,7 +21,7 @@
 
 [Português](README_pt.md) | [Русский](README_ru.md) | [العربية](README_ar.md) | [Italiano](README_it.md) | [हिन्दी](README_hi.md) | [Español](README_es.md)
 
-[上流プロジェクト](https://github.com/jinzhenyi/Storlane) · [貢献ガイド](https://github.com/jinzhenyi/Storlane/blob/main/CONTRIBUTING.md) · [行動規範](https://github.com/jinzhenyi/Storlane/blob/main/CODE_OF_CONDUCT.md) · [ライセンス](./LICENSE)
+[上流プロジェクト](https://github.com/OpenListTeam/OpenList-Worker) · [貢献ガイド](https://github.com/jinzhenyi/Storlane/blob/main/CONTRIBUTING.md) · [行動規範](https://github.com/jinzhenyi/Storlane/blob/main/CODE_OF_CONDUCT.md) · [ライセンス](./LICENSE)
 
 [🌎 グローバルデモ](https://new.oplist.org) 　|　 [🇨🇳 中国デモ](https://new.oplist.org.cn)
 
@@ -53,7 +53,7 @@
 
 Storlane はエッジコンピューティングプラットフォーム上で動作するマルチストレージ集約型のファイルリスト・管理システムで、異なるクラウドドライブ、オブジェクトストレージ、プロトコルサービスに分散したファイルを単一のインターフェースに統合し、閲覧・プレビュー・ダウンロード・管理できます。
 
-Storlane は公式 [jinzhenyi/Storlane](https://github.com/jinzhenyi/Storlane) プロジェクトの TypeScript + Serverless 移植版で、バックエンドを Go から Workers 上で動作する TypeScript サービスに書き換え、フロントエンドは一貫したインターフェースと操作体験を維持しています。
+Storlane は公式 [OpenListTeam/OpenList](https://github.com/OpenListTeam/OpenList) プロジェクトの TypeScript + Serverless 移植版で、バックエンドを Go から Workers 上で動作する TypeScript サービスに書き換え、フロントエンドは一貫したインターフェースと操作体験を維持しています。
 
 ### ストレージ集約
 
@@ -169,7 +169,8 @@ pnpm run deploy:worker
 以下のプロジェクトとその貢献者に感謝します：
 
 - [Alist](https://github.com/AlistGo/alist) プロジェクトの作者と全貢献者
-- [Storlane](https://github.com/jinzhenyi/Storlane)（Go 版）プロジェクトの作者と全貢献者
+- [OpenList](https://github.com/OpenListTeam/OpenList)（Go 版）プロジェクトの作者と全貢献者
+- [OpenList-Worker](https://github.com/OpenListTeam/OpenList-Worker) (TypeScript + Serverless 版)
 - 本プロジェクトの全貢献者：
 
 [![Contributors](https://contrib.rocks/image?repo=jinzhenyi/Storlane)](https://github.com/jinzhenyi/Storlane/graphs/contributors)

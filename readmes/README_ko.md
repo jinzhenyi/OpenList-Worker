@@ -2,7 +2,7 @@
   <img src="https://raw.githubusercontent.com/StorlaneTeam/Logo/main/logo.svg" width="128" height="128" alt="logo" />
 
   <p><em>Storlane는 다양한 기능을 갖춘 디렉터리 목록 도구로, 수십 가지 클라우드 드라이브 마운트와 파일 미리보기/다운로드/공유 등을 지원합니다</em></p>
-  <p>이 저장소는 공식 <a href="https://github.com/jinzhenyi/Storlane">jinzhenyi/Storlane</a> 프로젝트의 TypeScript + Serverless 아키텍처 포팅 버전입니다</p>
+  <p>이 저장소는 공식 <a href="https://github.com/OpenListTeam/OpenList">OpenListTeam/OpenList</a> 프로젝트의 TypeScript + Serverless 아키텍처 포팅 버전입니다</p>
   <p>Cloudflare Workers / EdgeOne Cloud Function / Alibaba Cloud ESA에서 실행됩니다</p>
 
 <a href="https://github.com/jinzhenyi/Storlane/blob/main/LICENSE"><img src="https://img.shields.io/github/license/jinzhenyi/Storlane" alt="License" /></a>
@@ -21,7 +21,7 @@
 
 [Português](README_pt.md) | [Русский](README_ru.md) | [العربية](README_ar.md) | [Italiano](README_it.md) | [हिन्दी](README_hi.md) | [Español](README_es.md)
 
-[업스트림 프로젝트](https://github.com/jinzhenyi/Storlane) · [기여 가이드](https://github.com/jinzhenyi/Storlane/blob/main/CONTRIBUTING.md) · [행동 강령](https://github.com/jinzhenyi/Storlane/blob/main/CODE_OF_CONDUCT.md) · [라이선스](./LICENSE)
+[업스트림 프로젝트](https://github.com/OpenListTeam/OpenList-Worker) · [기여 가이드](https://github.com/jinzhenyi/Storlane/blob/main/CONTRIBUTING.md) · [행동 강령](https://github.com/jinzhenyi/Storlane/blob/main/CODE_OF_CONDUCT.md) · [라이선스](./LICENSE)
 
 [🌎 글로벌 데모](https://new.oplist.org) 　|　 [🇨🇳 중국 데모](https://new.oplist.org.cn)
 
@@ -53,7 +53,7 @@
 
 Storlane는 엣지 컴퓨팅 플랫폼에서 실행되는 다중 스토리지 집계 파일 목록 및 관리 시스템으로, 여러 클라우드 드라이브, 오브젝트 스토리지, 프로토콜 서비스에 분산된 파일을 하나의 인터페이스에 통합하여 탐색, 미리보기, 다운로드, 관리할 수 있습니다.
 
-Storlane는 공식 [jinzhenyi/Storlane](https://github.com/jinzhenyi/Storlane) 프로젝트의 TypeScript + Serverless 포팅 버전으로, 백엔드를 Go에서 Workers에서 실행되는 TypeScript 서비스로 재작성했으며, 프런트엔드는 일관된 인터페이스와 상호작용 경험을 유지합니다.
+Storlane는 공식 [OpenListTeam/OpenList](https://github.com/OpenListTeam/OpenList) 프로젝트의 TypeScript + Serverless 포팅 버전으로, 백엔드를 Go에서 Workers에서 실행되는 TypeScript 서비스로 재작성했으며, 프런트엔드는 일관된 인터페이스와 상호작용 경험을 유지합니다.
 
 ### 스토리지 집계
 
@@ -169,7 +169,8 @@ pnpm run deploy:worker
 다음 프로젝트와 그 기여자들에게 감사드립니다：
 
 - [Alist](https://github.com/AlistGo/alist) 프로젝트 작성자 및 모든 기여자
-- [Storlane](https://github.com/jinzhenyi/Storlane)（Go 버전）프로젝트 작성자 및 모든 기여자
+- [OpenList](https://github.com/OpenListTeam/OpenList)（Go 버전）프로젝트 작성자 및 모든 기여자
+- [OpenList-Worker](https://github.com/OpenListTeam/OpenList-Worker) (TypeScript + Serverless 版)
 - 이 프로젝트의 모든 기여자：
 
 [![Contributors](https://contrib.rocks/image?repo=jinzhenyi/Storlane)](https://github.com/jinzhenyi/Storlane/graphs/contributors)

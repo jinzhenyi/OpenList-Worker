@@ -2,7 +2,7 @@
   <img src="https://raw.githubusercontent.com/StorlaneTeam/Logo/main/logo.svg" width="128" height="128" alt="logo" />
 
   <p><em>Storlane 是一個多功能的目錄列表工具，支援數十種網盤檔案掛載和檔案預覽/下載/分享等功能</em></p>
-  <p>本倉庫是官方 <a href="https://github.com/jinzhenyi/Storlane">jinzhenyi/Storlane</a> 專案的 TypeScript + Serverless 架構移植版</p>
+  <p>本倉庫是官方 <a href="https://github.com/OpenListTeam/OpenList">OpenListTeam/OpenList</a> 專案的 TypeScript + Serverless 架構移植版</p>
   <p>基於 Cloudflare Workers / EdgeOne Cloud Function / Alibaba Cloud ESA 運行</p>
 
 <a href="https://github.com/jinzhenyi/Storlane/blob/main/LICENSE"><img src="https://img.shields.io/github/license/jinzhenyi/Storlane" alt="License" /></a>
@@ -21,7 +21,7 @@
 
 [Português](README_pt.md) | [Русский](README_ru.md) | [العربية](README_ar.md) | [Italiano](README_it.md) | [हिन्दी](README_hi.md) | [Español](README_es.md)
 
-[上游專案](https://github.com/jinzhenyi/Storlane) · [貢獻指南](https://github.com/jinzhenyi/Storlane/blob/main/CONTRIBUTING.md) · [行為準則](https://github.com/jinzhenyi/Storlane/blob/main/CODE_OF_CONDUCT.md) · [許可證](./LICENSE)
+[上游專案](https://github.com/OpenListTeam/OpenList-Worker) · [貢獻指南](https://github.com/jinzhenyi/Storlane/blob/main/CONTRIBUTING.md) · [行為準則](https://github.com/jinzhenyi/Storlane/blob/main/CODE_OF_CONDUCT.md) · [許可證](./LICENSE)
 
 [🌎 全球 Demo](https://new.oplist.org) 　|　 [🇨🇳 中國 Demo](https://new.oplist.org.cn)
 
@@ -53,7 +53,7 @@
 
 Storlane 是一個運行於邊緣運算平台的多儲存聚合檔案列表與管理系統，可將分散在不同網盤、物件儲存與協定服務中的檔案統一到一個介面，進行瀏覽、預覽、下載與管理。
 
-Storlane 是官方 [jinzhenyi/Storlane](https://github.com/jinzhenyi/Storlane) 專案的 TypeScript + Serverless 移植版，後端由 Go 重寫為運行於 Workers 的 TypeScript 服務，前端保持一致的介面與互動體驗。
+Storlane 是官方 [OpenListTeam/OpenList](https://github.com/OpenListTeam/OpenList) 專案的 TypeScript + Serverless 移植版，後端由 Go 重寫為運行於 Workers 的 TypeScript 服務，前端保持一致的介面與互動體驗。
 
 ### 儲存聚合
 
@@ -169,7 +169,8 @@ pnpm run deploy:worker
 感謝以下專案及其貢獻者：
 
 - [Alist](https://github.com/AlistGo/alist) 專案作者及全體貢獻者
-- [Storlane](https://github.com/jinzhenyi/Storlane)（Go 版）專案作者及全體貢獻者
+- [OpenList](https://github.com/OpenListTeam/OpenList)（Go 版）專案作者及全體貢獻者
+- [OpenList-Worker](https://github.com/OpenListTeam/OpenList-Worker) (TypeScript + Serverless 版)
 - 本專案全體貢獻者：
 
 [![Contributors](https://contrib.rocks/image?repo=jinzhenyi/Storlane)](https://github.com/jinzhenyi/Storlane/graphs/contributors)

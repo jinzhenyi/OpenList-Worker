@@ -2,7 +2,7 @@
   <img src="https://raw.githubusercontent.com/StorlaneTeam/Logo/main/logo.svg" width="128" height="128" alt="logo" />
 
   <p><em>Storlane هي أداة غنية بالميزات لعرض الأدلة، تدعم تركيب العشرات من الأقراص السحابية مع المعاينة والتنزيل ومشاركة الملفات والمزيد</em></p>
-  <p>هذا المستودع هو المنفذ الرسمي TypeScript + Serverless لمشروع <a href="https://github.com/jinzhenyi/Storlane">jinzhenyi/Storlane</a></p>
+  <p>هذا المستودع هو المنفذ الرسمي TypeScript + Serverless لمشروع <a href="https://github.com/OpenListTeam/OpenList">OpenListTeam/OpenList</a></p>
   <p>يعمل على Cloudflare Workers / EdgeOne Cloud Function / Alibaba Cloud ESA</p>
 
 <a href="https://github.com/jinzhenyi/Storlane/blob/main/LICENSE"><img src="https://img.shields.io/github/license/jinzhenyi/Storlane" alt="License" /></a>
@@ -21,7 +21,7 @@
 
 [Português](README_pt.md) | [Русский](README_ru.md) | العربية | [Italiano](README_it.md) | [हिन्दी](README_hi.md) | [Español](README_es.md)
 
-[المشروع الأصلي](https://github.com/jinzhenyi/Storlane) · [دليل المساهمة](https://github.com/jinzhenyi/Storlane/blob/main/CONTRIBUTING.md) · [مدونة السلوك](https://github.com/jinzhenyi/Storlane/blob/main/CODE_OF_CONDUCT.md) · [الترخيص](./LICENSE)
+[المشروع الأصلي](https://github.com/OpenListTeam/OpenList-Worker) · [دليل المساهمة](https://github.com/jinzhenyi/Storlane/blob/main/CONTRIBUTING.md) · [مدونة السلوك](https://github.com/jinzhenyi/Storlane/blob/main/CODE_OF_CONDUCT.md) · [الترخيص](./LICENSE)
 
 [🌎 العرض العالمي](https://new.oplist.org) 　|　 [🇨🇳 عرض الصين](https://new.oplist.org.cn)
 
@@ -53,7 +53,7 @@
 
 Storlane هو نظام عرض وإدارة ملفات متعدد التخزين يعمل على منصات الحوسبة الطرفية. يوحّد الملفات المتناثرة عبر أقراص سحابية وتخزين كائنات وخدمات بروتوكولات مختلفة في واجهة واحدة للتصفح والمعاينة والتنزيل والإدارة.
 
-Storlane هو المنفذ الرسمي TypeScript + Serverless لمشروع [jinzhenyi/Storlane](https://github.com/jinzhenyi/Storlane). أُعيدت كتابة الواجهة الخلفية من Go إلى خدمة TypeScript تعمل على Workers، بينما تحافظ الواجهة الأمامية على واجهة وتجربة تفاعل متسقة.
+Storlane هو المنفذ الرسمي TypeScript + Serverless لمشروع [OpenListTeam/OpenList](https://github.com/OpenListTeam/OpenList). أُعيدت كتابة الواجهة الخلفية من Go إلى خدمة TypeScript تعمل على Workers، بينما تحافظ الواجهة الأمامية على واجهة وتجربة تفاعل متسقة.
 
 ### تجميع التخزين
 
@@ -169,7 +169,8 @@ pnpm run deploy:worker
 شكرًا للمشاريع التالية ومساهميها:
 
 - مؤلف [Alist](https://github.com/AlistGo/alist) وجميع المساهمين
-- مؤلف [Storlane](https://github.com/jinzhenyi/Storlane) (نسخة Go) وجميع المساهمين
+- مؤلف [OpenList](https://github.com/OpenListTeam/OpenList) (نسخة Go) وجميع المساهمين
+- [OpenList-Worker](https://github.com/OpenListTeam/OpenList-Worker) (TypeScript + Serverless 版)
 - جميع المساهمين في هذا المشروع:
 
 [![Contributors](https://contrib.rocks/image?repo=jinzhenyi/Storlane)](https://github.com/jinzhenyi/Storlane/graphs/contributors)

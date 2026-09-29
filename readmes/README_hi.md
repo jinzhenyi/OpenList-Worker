@@ -2,7 +2,7 @@
   <img src="https://raw.githubusercontent.com/StorlaneTeam/Logo/main/logo.svg" width="128" height="128" alt="logo" />
 
   <p><em>Storlane एक सुविधा-संपन्न निर्देशिका सूची उपकरण है जो दर्जनों क्लाउड ड्राइव माउंट करने और फ़ाइल पूर्वावलोकन/डाउनलोड/साझाकरण आदि का समर्थन करता है</em></p>
-  <p>यह रिपॉजिटरी आधिकारिक <a href="https://github.com/jinzhenyi/Storlane">jinzhenyi/Storlane</a> परियोजना का TypeScript + Serverless आर्किटेक्चर पोर्ट है</p>
+  <p>यह रिपॉजिटरी आधिकारिक <a href="https://github.com/OpenListTeam/OpenList">OpenListTeam/OpenList</a> परियोजना का TypeScript + Serverless आर्किटेक्चर पोर्ट है</p>
   <p>Cloudflare Workers / EdgeOne Cloud Function / Alibaba Cloud ESA पर चलता है</p>
 
 <a href="https://github.com/jinzhenyi/Storlane/blob/main/LICENSE"><img src="https://img.shields.io/github/license/jinzhenyi/Storlane" alt="License" /></a>
@@ -21,7 +21,7 @@
 
 [Português](README_pt.md) | [Русский](README_ru.md) | [العربية](README_ar.md) | [Italiano](README_it.md) | हिन्दी | [Español](README_es.md)
 
-[अपस्ट्रीम परियोजना](https://github.com/jinzhenyi/Storlane) · [योगदान मार्गदर्शिका](https://github.com/jinzhenyi/Storlane/blob/main/CONTRIBUTING.md) · [आचार संहिता](https://github.com/jinzhenyi/Storlane/blob/main/CODE_OF_CONDUCT.md) · [लाइसेंस](./LICENSE)
+[अपस्ट्रीम परियोजना](https://github.com/OpenListTeam/OpenList-Worker) · [योगदान मार्गदर्शिका](https://github.com/jinzhenyi/Storlane/blob/main/CONTRIBUTING.md) · [आचार संहिता](https://github.com/jinzhenyi/Storlane/blob/main/CODE_OF_CONDUCT.md) · [लाइसेंस](./LICENSE)
 
 [🌎 वैश्विक डेमो](https://new.oplist.org) 　|　 [🇨🇳 चीन डेमो](https://new.oplist.org.cn)
 
@@ -53,7 +53,7 @@
 
 Storlane एक बहु-स्टोरेज एग्रीगेशन फ़ाइल सूची और प्रबंधन प्रणाली है जो एज कंप्यूटिंग प्लेटफ़ॉर्म पर चलती है। यह विभिन्न क्लाउड ड्राइव, ऑब्जेक्ट स्टोरेज और प्रोटोकॉल सेवाओं में बिखरी फ़ाइलों को एक ही इंटरफ़ेस में एकीकृत करती है, जिससे ब्राउज़िंग, पूर्वावलोकन, डाउनलोड और प्रबंधन संभव होता है।
 
-Storlane आधिकारिक [jinzhenyi/Storlane](https://github.com/jinzhenyi/Storlane) परियोजना का TypeScript + Serverless पोर्ट है। बैकएंड को Go से Workers पर चलने वाली TypeScript सेवा में फिर से लिखा गया है, जबकि फ्रंटएंड एक सुसंगत इंटरफ़ेस और इंटरैक्शन अनुभव बनाए रखता है।
+Storlane आधिकारिक [OpenListTeam/OpenList](https://github.com/OpenListTeam/OpenList) परियोजना का TypeScript + Serverless पोर्ट है। बैकएंड को Go से Workers पर चलने वाली TypeScript सेवा में फिर से लिखा गया है, जबकि फ्रंटएंड एक सुसंगत इंटरफ़ेस और इंटरैक्शन अनुभव बनाए रखता है।
 
 ### स्टोरेज एग्रीगेशन
 
@@ -169,7 +169,8 @@ pnpm run deploy:worker
 निम्नलिखित परियोजनाओं और उनके योगदानकर्ताओं को धन्यवाद:
 
 - [Alist](https://github.com/AlistGo/alist) परियोजना के लेखक और सभी योगदानकर्ता
-- [Storlane](https://github.com/jinzhenyi/Storlane)（Go संस्करण）परियोजना के लेखक और सभी योगदानकर्ता
+- [OpenList](https://github.com/OpenListTeam/OpenList)（Go संस्करण）परियोजना के लेखक और सभी योगदानकर्ता
+- [OpenList-Worker](https://github.com/OpenListTeam/OpenList-Worker) (TypeScript + Serverless 版)
 - इस परियोजना के सभी योगदानकर्ता:
 
 [![Contributors](https://contrib.rocks/image?repo=jinzhenyi/Storlane)](https://github.com/jinzhenyi/Storlane/graphs/contributors)
