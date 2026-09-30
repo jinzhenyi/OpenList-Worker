@@ -45,3 +45,13 @@ This file records user instructions, preferences, and project knowledge for refe
 - Instructions:
   - 本沙箱对 `*.vercel.app` 的 DNS 会被污染，解析到非 Vercel IP（如 `111.243.214.169`）导致 TLS 失败（`home=000`）。复测线上须绕过本地 DNS：先经 DoH（`https://cloudflare-dns.com/dns-query`）取真实 A 记录（如 `216.198.79.131` / `64.29.17.131`），再用 `curl --resolve openlist-tsworker.vercel.app:443:<ip> ...`。注意 zsh 不会对未加引号的变量做分词，`--resolve` 需内联或存数组。
   - 无鉴权 `POST /api/fs/list` 返回 `401 Unauthorized` 时，通常表示库中的 `guest` 用户被禁用（`getUserFromContext` 的 guest 回退要求 guest 存在且未禁用），与 `DB_CIPHER` 等配置无关。
+
+[Project Knowledge Summary]
+- Date: 2026-09-30
+- Context: Discovered by Agent while reverting the Storlane rebrand back to OpenList
+- Category: Operations & Deployment
+- Instructions:
+  - 品牌已从 Storlane **回退为 OpenList**：代码/README/多语言/logo/包名/KV 键均恢复（工作树等于品牌化前 `cfd28fe`）。前端构建已切回上游 `OpenListTeam/OpenList-Frontend`（`scripts/fetch-frontend.mjs`）。
+  - **过渡迁移（临时，勿长期保留）**：`src/backend/internal/model/legacy-storlane-migrate.ts` 会在 `src/backend/index.ts` 的全局中间件里幂等执行，把 `storlane_config` / `storlane_jwt_secret` / `storlane_encryption_secret` 复制到 `openlist_*`（配置 JSON 内 `site_title`/`logo`/`favicon` 归一化为 OpenList 默认）。部署一次并触发任意非 KV 代理请求即完成迁移；确认线上数据完好后删除该文件与 index.ts 调用点（第二次提交）。
+  - 迁移必须早于鉴权：`getJwtSecret` 会在 `openlist_encryption_secret` 缺失时重新生成密钥，若先跑鉴权会导致旧加密密钥被覆盖、既有密文无法解密。
+  - 回退期间遗留但未清理：前端 fork `jinzhenyi/Storlane-Frontend`（含 `edge` release 的 `i18n.tar.gz`）已不再被构建引用；GitHub 仓库名 `jinzhenyi/Storlane` 计划改回 `jinzhenyi/OpenList-Worker`，Vercel 项目名改回 `openlist-tsworker`。
