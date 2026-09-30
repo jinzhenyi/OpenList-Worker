@@ -55,7 +55,7 @@ function createCountingBackend(initial: any) {
 }
 
 const SAMPLE = {
-  settings: [{ key: "site_title", value: "Storlane" }],
+  settings: [{ key: "site_title", value: "OpenList" }],
   storages: [],
   users: [],
   shares: [],
@@ -224,7 +224,7 @@ test("getDb: 五个无参 getter 复用同一份缓存快照", async () => {
     "五个无参 getter 并发调用应合并为一次 load（修复前为 5 次）",
   )
   // getSettings() 返回「key -> value」的扁平对象，而非数组。
-  assert.equal(settings.site_title, "Storlane")
+  assert.equal(settings.site_title, "OpenList")
   assert.equal(users[0].username, "admin")
   assert.ok(Array.isArray(storages))
   assert.ok(Array.isArray(metas))

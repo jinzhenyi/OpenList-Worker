@@ -22,7 +22,7 @@ import { getJwtSecret, resetJwtSecretCache } from "./middlewares"
  * 一次请求 = 一个 env 对象。
  */
 
-const JWT_SECRET_KV_KEY = "storlane_jwt_secret"
+const JWT_SECRET_KV_KEY = "openlist_jwt_secret"
 const STRONG_SECRET = "a".repeat(48)
 
 /** 构造带读取计数的 KV 绑定（每次新建，绑定到不同的 env 上）。 */

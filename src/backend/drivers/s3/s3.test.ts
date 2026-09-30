@@ -43,7 +43,7 @@ async function test() {
   // 3. Path & Key
   console.assert(getKey("/foo/bar/test.txt", false) === "foo/bar/test.txt")
   console.assert(getKey("/foo/bar", true) === "foo/bar/")
-  console.assert(getPlaceholderName("") === ".storlane")
+  console.assert(getPlaceholderName("") === ".openlist")
   console.assert(getPlaceholderName(".custom") === ".custom")
   console.assert(joinPath("a/b", "/c/d/", "e") === "a/b/c/d/e")
 
@@ -81,7 +81,7 @@ async function test() {
         <Size>123456</Size>
       </Contents>
       <Contents>
-        <Key>photos/.storlane</Key>
+        <Key>photos/.openlist</Key>
         <LastModified>2026-08-22T12:00:00.000Z</LastModified>
         <ETag>"d41d8cd98f00b204e9800998ecf8427e"</ETag>
         <Size>0</Size>
@@ -162,7 +162,7 @@ async function test() {
   })
   console.assert(norm.bucket === "test_bucket")
   console.assert(norm.endpoint === "https://s3.example.com/")
-  console.assert(norm.region === "storlane")
+  console.assert(norm.region === "openlist")
   console.assert(norm.sign_url_expire === 4)
 
   const driver = new S3Driver(norm)

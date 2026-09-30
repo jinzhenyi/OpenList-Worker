@@ -33,7 +33,7 @@ async function getBlobStore(): Promise<any | null> {
     // In Makers Functions, projectId/token are auto-injected by the runtime.
     // TypeScript types require them, but the SDK works without them inside Functions.
     _blobStore = getStore({
-      name: "storlane_db",
+      name: "openlist_db",
       consistency: "strong",
     } as any)
   } catch {
@@ -376,9 +376,9 @@ export async function getKvBinding(envCtx?: any): Promise<{
   })
 }
 
-async function readFromKvExact(
+async function readFromKv(
   kvInfo: Awaited<ReturnType<typeof getKvBinding>>,
-  key = "storlane_config",
+  key = "openlist_config",
 ): Promise<any | null> {
   const { binding, mode } = kvInfo
   if (mode === "none" || !binding) return null
@@ -419,22 +419,6 @@ async function readFromKvExact(
     }
   } catch (err) {
     console.error("[KV/Blob Store] Error reading key:", key, err)
-  }
-  return null
-}
-
-/**
- * 读取配置键，带旧品牌键回退（改名兼容：openlist_config → storlane_config）。
- * 新键命中即返回；否则回退旧键，避免既有部署被判定为无数据。
- */
-async function readFromKv(
-  kvInfo: Awaited<ReturnType<typeof getKvBinding>>,
-  key = "storlane_config",
-): Promise<any | null> {
-  const val = await readFromKvExact(kvInfo, key)
-  if (val != null) return val
-  if (key === "storlane_config") {
-    return await readFromKvExact(kvInfo, "openlist_config")
   }
   return null
 }
@@ -515,7 +499,7 @@ export async function getKvStatus(envCtx?: any) {
 
   if (isConfigured) {
     try {
-      const testVal = await readFromKv(kvInfo, "storlane_config")
+      const testVal = await readFromKv(kvInfo, "openlist_config")
       connected = true
       return {
         configured: true,

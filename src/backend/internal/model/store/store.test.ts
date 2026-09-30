@@ -162,7 +162,7 @@ function createMockSqlDriver(name = "mock-sql"): Driver {
 }
 
 const SAMPLE_DB = {
-  settings: [{ key: "site_title", value: "Storlane" }],
+  settings: [{ key: "site_title", value: "OpenList" }],
   storages: [{ id: 1, mount_path: "/x", driver: "local" }],
   users: [
     { id: 1, username: "admin", role: 2, permission: 0, disabled: false },
@@ -379,18 +379,18 @@ test("secret persistence: write/read works with explicit DB_DRIVER=d1", async ()
 
   const written = await writePersistedSecret(
     env,
-    "storlane_jwt_secret",
+    "openlist_jwt_secret",
     "stable-secret-value-with-enough-length",
   )
   assert.equal(written, true)
   assert.equal(
-    d1.store.get("storlane_jwt_secret"),
+    d1.store.get("openlist_jwt_secret"),
     "stable-secret-value-with-enough-length",
   )
 
   // 写进去必须能读回来（修复前该断言会失败）
   assert.equal(
-    await readPersistedSecret(env, "storlane_jwt_secret"),
+    await readPersistedSecret(env, "openlist_jwt_secret"),
     "stable-secret-value-with-enough-length",
   )
 
@@ -401,9 +401,9 @@ test("secret persistence: write/read works with explicit DB_DRIVER=d1", async ()
 test("secret persistence: degrades gracefully when no backend is available", async () => {
   // 未配置任何存储时：读返回 null、写返回 false，不得抛错。
   const env = { DB_DRIVER: "kv" }
-  assert.equal(await readPersistedSecret(env, "storlane_jwt_secret"), null)
+  assert.equal(await readPersistedSecret(env, "openlist_jwt_secret"), null)
   assert.equal(
-    await writePersistedSecret(env, "storlane_jwt_secret", "x"),
+    await writePersistedSecret(env, "openlist_jwt_secret", "x"),
     false,
   )
 })

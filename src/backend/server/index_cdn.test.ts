@@ -8,13 +8,13 @@ const INDEX_HTML = `<!doctype html>
   <head>
     <meta name="frontend-version" content="4.2.6">
     <script>
-      window.STORLANE_CONFIG = {
+      window.OPENLIST_CONFIG = {
         cdn: undefined,
         base_path: undefined,
         api: undefined,
         main_color: undefined,
       }
-      window.__dynamic_base__ = window.STORLANE_CONFIG.cdn || ""
+      window.__dynamic_base__ = window.OPENLIST_CONFIG.cdn || ""
     </script>
     <script type="module" src="/assets/index-LOCAL.js"></script>
   </head>
@@ -285,7 +285,7 @@ test("集成: $version 用构建期版本戳解析（不再落 latest）", async
   const env = {
     ASSETS: makeFakeAssets(),
     ASSET_URLS:
-      "https://cdn.jsdelivr.net/npm/@storlane-frontend/storlane-frontend@$version/dist",
+      "https://cdn.jsdelivr.net/npm/@openlist-frontend/openlist-frontend@$version/dist",
   }
   const res = await withFetch(
     () => app.request("/", { headers }, env as any),
@@ -293,12 +293,12 @@ test("集成: $version 用构建期版本戳解析（不再落 latest）", async
   )
   assert.equal(res.status, 200)
   assert.deepEqual(log, [
-    "HEAD https://cdn.jsdelivr.net/npm/@storlane-frontend/storlane-frontend@4.2.6/dist/assets/index-LOCAL.js",
+    "HEAD https://cdn.jsdelivr.net/npm/@openlist-frontend/openlist-frontend@4.2.6/dist/assets/index-LOCAL.js",
   ])
   const html = await res.text()
   assert.match(
     html,
-    /cdn: 'https:\/\/cdn\.jsdelivr\.net\/npm\/@storlane-frontend\/storlane-frontend@4\.2\.6\/dist'/,
+    /cdn: 'https:\/\/cdn\.jsdelivr\.net\/npm\/@openlist-frontend\/openlist-frontend@4\.2\.6\/dist'/,
   )
 })
 

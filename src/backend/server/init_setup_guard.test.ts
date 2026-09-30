@@ -75,7 +75,7 @@ test("init/setup：全新空存储首次初始化必须成功并真正落盘", a
   assert.equal(json.code, 200)
   assert.equal(json.data, null)
   assert.equal(
-    env.KV.__store.has("storlane_config"),
+    env.KV.__store.has("openlist_config"),
     true,
     "初始化必须真正写入持久化后端",
   )
@@ -127,7 +127,7 @@ test("init_status：配置 ADMIN_PASS 时，安装页轮询即可完成初始化
     "ADMIN_PASS must take effect on the init page (issue #62 现象 2)",
   )
   assert.equal(
-    env.KV.__store.has("storlane_config"),
+    env.KV.__store.has("openlist_config"),
     true,
     "自动初始化必须真正落盘",
   )

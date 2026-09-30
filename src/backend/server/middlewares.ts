@@ -17,10 +17,7 @@ import { getDb, readPersistedSecret, ENCRYPTION_SECRET_KV_KEY } from "../interna
 // TS 版必须按 env 隔离才能保持同样的语义。
 let cachedJwtSecret: string | null = null
 let jwtSecretByEnv = new WeakMap<object, string>()
-const JWT_SECRET_KV_KEY = "storlane_jwt_secret"
-// 旧品牌（OpenList 时代）槽位名：仅用于兼容读取，写入始终用新槽位。
-const LEGACY_JWT_SECRET_KV_KEY = "openlist_jwt_secret"
-const LEGACY_ENCRYPTION_SECRET_KV_KEY = "openlist_encryption_secret"
+const JWT_SECRET_KV_KEY = "openlist_jwt_secret"
 
 /** 记录某个 env 的密钥，并更新进程级 last-known 值（无 env 对象时的兜底）。 */
 function rememberJwtSecret(env: any, secret: string): void {
@@ -41,7 +38,7 @@ function readCachedJwtSecret(env: any): string | null {
  *   - Go 的 `reset_token` 重置的是**链接签名密钥**，即 DB 里的 `token` 设置
  *     （internal/sign/sign.go: NewHMACSign(setting.GetStr(conf.Token))），
  *     并不更换 JWT 密钥（JWT 用 common.SecretKey = conf.Conf.JwtSecret）；
- *   - TS 的 JWT 密钥来自 env.JWT_SECRET 或持久化的 storlane_jwt_secret，清缓存
+ *   - TS 的 JWT 密钥来自 env.JWT_SECRET 或持久化的 openlist_jwt_secret，清缓存
  *     后读到的是**同一把**密钥，因此已签发的 JWT **不会**失效——这与 Go 一致。
  * 若确实要求所有已签发 JWT 立即失效，必须更换密钥本身，而不是只清缓存。
  */
@@ -61,10 +58,7 @@ async function readKvSecret(env: any): Promise<string | null> {
   try {
     // 复用 store/json 的通用密钥读取（已支持 binding/blob/api/proxy 全模式）
     const { readPersistedSecret } = await import("../internal/model/db")
-    const current = await readPersistedSecret(env, JWT_SECRET_KV_KEY)
-    if (current) return current
-    // 改名兼容：新槽位为空时回退旧槽位，避免既有部署冷启动即换钥。
-    return await readPersistedSecret(env, LEGACY_JWT_SECRET_KV_KEY)
+    return await readPersistedSecret(env, JWT_SECRET_KV_KEY)
   } catch (e) {
     console.warn("[JWT] Failed to read secret from KV:", e)
     return null
@@ -120,26 +114,20 @@ export async function getJwtSecret(c?: Context | any): Promise<string> {
     return cached as string
   }
 
-  // 2a. 复用 setup 自动生成的共享密钥（storlane_encryption_secret）。
+  // 2a. 复用 setup 自动生成的共享密钥（openlist_encryption_secret）。
   //
   // 为什么必须放在这里：`ensureEncryptionSecret()` 在 setup 阶段把自动生成的
-  // 密钥写进 **storlane_encryption_secret**，而本函数历史实现只找
-  // **storlane_jwt_secret** —— 两个槽位名不同。于是「自动生成」的那把密钥
+  // 密钥写进 **openlist_encryption_secret**，而本函数历史实现只找
+  // **openlist_jwt_secret** —— 两个槽位名不同。于是「自动生成」的那把密钥
   // 对 JWT 侧**完全不可见**：本函数会再生成一把存到另一个槽位，
   // 造成同一部署里两把密钥各自漂移（多实例验签失败、冷启动即换钥）。
   // 约定 JWT 签名与字段加密共用同一把密钥（见 db.ts 的「静态加密」注释块；
   // 字段加密是否启用由 DB_CIPHER 决定，与密钥来源无关），因此这里
   // 显式回退读取该槽位，保证「生成了一份」就等于「两边都可用」。
   try {
-    let sharedSecret = useSecret(
+    const sharedSecret = useSecret(
       await readPersistedSecret(env, ENCRYPTION_SECRET_KV_KEY),
     )
-    if (!sharedSecret) {
-      // 改名兼容：新槽位为空时回退旧槽位（openlist_encryption_secret）。
-      sharedSecret = useSecret(
-        await readPersistedSecret(env, LEGACY_ENCRYPTION_SECRET_KV_KEY),
-      )
-    }
     if (sharedSecret) {
       rememberJwtSecret(env, sharedSecret)
       return sharedSecret
@@ -198,7 +186,7 @@ export async function getJwtSecret(c?: Context | any): Promise<string> {
 // 说明：Serverless 多实例下各实例独立缓存，KV 持久化仅在冷启动时加载一次，
 // 因此跨实例的「即时」失效不能保证精确，但能在单实例内立即生效，并随新实例
 // 冷启动逐步收敛。exp 过期后条目自动清理，不会无限增长。
-const REVOKED_KV_KEY = "storlane_revoked_tokens"
+const REVOKED_KV_KEY = "openlist_revoked_tokens"
 const revokedJtis = new Set<string>()
 let revokedLoaded = false
 

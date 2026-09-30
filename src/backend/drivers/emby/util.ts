@@ -6,7 +6,7 @@ import {
 } from "./types"
 
 const embyClientHeader =
-  `MediaBrowser Client="Storlane", Device="Storlane", DeviceId="storlane-emby", Version="1.0.0"`
+  `MediaBrowser Client="OpenList", Device="OpenList", DeviceId="openlist-emby", Version="1.0.0"`
 
 export class EmbyClient {
   baseURL: string

@@ -16,7 +16,7 @@ import QRCode from "qrcode"
  */
 export async function generateTOTPSecret(
   username: string,
-  issuer: string = "Storlane",
+  issuer: string = "OpenList",
 ): Promise<{ secret: string; qrcode: string; otpauth_url: string }> {
   // 生成 32 字符的 Base32 密钥
   const secret = authenticator.generateSecret()
@@ -159,7 +159,7 @@ export async function verifyTotpCode(secret: string, code: string): Promise<bool
 export function buildOtpauthUrl(
   secret: string,
   username: string,
-  issuer: string = "Storlane",
+  issuer: string = "OpenList",
 ): string {
   return authenticator.keyuri(username, issuer, secret)
 }

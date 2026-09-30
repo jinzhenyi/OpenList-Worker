@@ -67,7 +67,7 @@ test("EO/ESA Blob + map：全新空存储的首次初始化必须成功", async 
     "Blob 空存储必须先能通过向导初始化，否则会退化为永远无法安装",
   )
   assert.equal(
-    env.ESA_BLOB.__store.has("storlane_config"),
+    env.ESA_BLOB.__store.has("openlist_config"),
     true,
     "初始化必须真正写入 Blob",
   )

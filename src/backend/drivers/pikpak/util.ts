@@ -218,7 +218,7 @@ export class PikPakApiClient {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "User-Agent": this.userAgent || "Storlane",
+          "User-Agent": this.userAgent || "OpenList",
           "X-Device-ID": this.deviceId,
         },
         body: JSON.stringify(param),
@@ -294,7 +294,7 @@ export class PikPakApiClient {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "User-Agent": this.userAgent || "Storlane",
+          "User-Agent": this.userAgent || "OpenList",
           "X-Device-ID": this.deviceId,
           "X-Captcha-Token": this.captchaTokenVal,
         },
@@ -341,7 +341,7 @@ export class PikPakApiClient {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "User-Agent": this.userAgent || "Storlane",
+          "User-Agent": this.userAgent || "OpenList",
           "X-Device-ID": this.deviceId,
         },
         body: JSON.stringify({
@@ -437,7 +437,7 @@ export class PikPakApiClient {
     }
 
     const headers: Record<string, string> = {
-      "User-Agent": this.userAgent || "Storlane",
+      "User-Agent": this.userAgent || "OpenList",
       "X-Device-ID": this.deviceId,
     }
     if (this.captchaTokenVal) {

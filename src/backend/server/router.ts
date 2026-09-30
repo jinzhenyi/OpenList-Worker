@@ -228,7 +228,7 @@ export function setupRouter(app: Hono) {
   app.get("/health", (c) =>
     c.json({
       ok: true,
-      name: "Storlane",
+      name: "OpenList",
       version: "v4.2.3",
       environment: resolveEnvironment(c.env as any),
     }),
@@ -324,7 +324,7 @@ export function setupRouter(app: Hono) {
     return c.json(
       {
         ok: healthy,
-        name: "Storlane",
+        name: "OpenList",
         version: "v4.2.3",
         environment: resolveEnvironment(c.env as any),
         checks,

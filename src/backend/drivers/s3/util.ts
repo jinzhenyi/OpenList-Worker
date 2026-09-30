@@ -23,7 +23,7 @@ export function getKey(pathStr: string, isDir = false): string {
 }
 
 export function getPlaceholderName(placeholder?: string): string {
-  return placeholder && placeholder.trim() ? placeholder.trim() : ".storlane"
+  return placeholder && placeholder.trim() ? placeholder.trim() : ".openlist"
 }
 
 export function getBaseName(pathStr: string): string {
@@ -271,7 +271,7 @@ export class S3Client {
     }
     this.endpoint = ep.replace(/\/+$/, "")
 
-    this.region = (addition.region || "").trim() || "storlane"
+    this.region = (addition.region || "").trim() || "openlist"
     this.accessKeyId = (addition.access_key_id || "").trim()
     this.secretAccessKey = (addition.secret_access_key || "").trim()
     this.sessionToken = addition.session_token

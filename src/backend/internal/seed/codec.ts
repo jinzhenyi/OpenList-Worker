@@ -406,7 +406,7 @@ export function decodeCas(data: Uint8Array): ParsedSeed {
         name: value.name,
         comment: "Imported from OpenList CAS metadata",
         created_at: new Date().toISOString(),
-        created_by: "Storlane",
+        created_by: "OpenList",
         piece_size: DEFAULT_PIECE_SIZE,
         files,
       }),
@@ -447,7 +447,7 @@ export function decodeCas(data: Uint8Array): ParsedSeed {
         Number.isFinite(created) && created > 0
           ? new Date(created * 1000).toISOString()
           : new Date().toISOString(),
-      created_by: "Storlane",
+      created_by: "OpenList",
       piece_size: value.slice_size || DEFAULT_PIECE_SIZE,
       files: [
         fileFromEntry({
@@ -615,7 +615,7 @@ export async function decodeTorrent(data: Uint8Array): Promise<ParsedSeed> {
       createdAt > 0
         ? new Date(createdAt * 1000).toISOString()
         : new Date().toISOString(),
-    created_by: asString(root["created by"]) || "Storlane",
+    created_by: asString(root["created by"]) || "OpenList",
     piece_size: pieceSize,
     trackers,
     channels: [],

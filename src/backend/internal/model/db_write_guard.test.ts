@@ -54,7 +54,7 @@ test("写前守卫：可信数据写入不受影响（含存储挂载的正常�
 
   // 先建立一次「可信」状态：写入一份含实体的库（携带 force，模拟初始化/首次落盘）。
   const realDb = {
-    settings: [{ key: "site_title", value: "Storlane" }],
+    settings: [{ key: "site_title", value: "OpenList" }],
     users: [{ id: 1, username: "admin", role: 2, password: "hash" }],
     storages: [{ id: 1, mount_path: "/onedrive", driver: "onedrive" }],
     shares: [],
@@ -87,7 +87,7 @@ test("写前守卫：读取失败后，即使内存中有旧快照也不允许�
   // 用一个 env 建立可信状态并落盘一份真实数据。
   const env = freshEnv()
   const realDb = {
-    settings: [{ key: "site_title", value: "Storlane" }],
+    settings: [{ key: "site_title", value: "OpenList" }],
     users: [{ id: 1, username: "admin", role: 2, password: "hash" }],
     storages: [{ id: 1, mount_path: "/onedrive", driver: "onedrive" }],
     shares: [],
@@ -125,7 +125,7 @@ test("不变量：读取（getDb）不得产生隐式写入", async () => {
   assert.equal(
     await db.saveDb(
       {
-        settings: [{ key: "site_title", value: "Storlane" }],
+        settings: [{ key: "site_title", value: "OpenList" }],
         users: [{ id: 1, username: "admin", role: 2, password: "hash" }],
         storages: [{ id: 1, mount_path: "/onedrive", driver: "onedrive" }],
         shares: [],

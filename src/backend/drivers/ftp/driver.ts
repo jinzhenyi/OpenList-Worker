@@ -1,4 +1,4 @@
-// FTP Storage Driver for Storlane
+// FTP Storage Driver for OpenList
 // Ported from OpenList: https://github.com/OpenListTeam/OpenList/tree/main/drivers/ftp
 
 import {

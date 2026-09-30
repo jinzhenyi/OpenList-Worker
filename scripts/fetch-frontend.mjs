@@ -1,21 +1,18 @@
 /**
- * 从官方前端 Storlane-Frontend 获取构建产物 (dist/)。
+ * 从官方前端 OpenList-Frontend 获取构建产物 (dist/)。
  *
- * Storlane(TSWorker) 后端不再维护内嵌前端源码，前端统一由官方仓库
- * Storlane-Frontend 提供（通过 backend 字段在运行时探测 GO/TS 模式）。
+ * OpenListNext(TSWorker) 后端不再维护内嵌前端源码，前端统一由官方仓库
+ * OpenList-Frontend 提供（通过 backend 字段在运行时探测 GO/TS 模式）。
  *
  * 产物来源优先级（高 -> 低）：
  *   1. FRONTEND_DIST 环境变量：已构建好的 dist 目录路径（最快，CI 缓存场景）
  *   2. FRONTEND_REPO 环境变量：本地官方前端仓库路径（自动 install + build）
- *   3. 同级目录 ../Storlane-Frontend（monorepo 布局，自动探测，自动 install + build）
- *   4. 默认：先尝试下载 npm 上【已发布】的 dist（版本取 registry 的 latest，
- *      可用 FRONTEND_VERSION 固定）；未发布时自动回退到 5
- *   5. 从 Git 克隆前端（Storlane-Frontend fork）main 分支并现构建；
- *      FRONTEND_BUILD_FROM_SOURCE=1 可强制走此路径
+ *   3. 同级目录 ../OpenList-Frontend（monorepo 布局，自动探测，自动 install + build）
+ *   4. 默认：下载 npm 上【已发布】的 dist（版本取 registry 的 latest，
+ *      可用 FRONTEND_VERSION 固定）
+ *   5. FRONTEND_BUILD_FROM_SOURCE=1：从 Git 克隆前端 main 分支并现构建
  *
- * 说明：本 fork 未发布到 npm，默认路径实际会回退到从 fork 现构建。
- *
- * 已发布 dist 优先的原因（若未来发布 npm 包仍适用）：
+ * 为什么默认取「已发布 dist」而不是「克隆 main 现构建」：
  *   前端产物是内容哈希文件名（/assets/index-XXXX.js），而 CDN（jsdelivr /
  *   unpkg / npmmirror）提供的正是 npm 包里那一份 dist。若本地从 main 现构建，
  *   哈希与 CDN 上的不一致，ASSET_URLS 的「路径 A」（下发本地 index.html +
@@ -27,7 +24,7 @@
  *
  * 用法：
  *   FRONTEND_DIST=/path/to/dist node scripts/fetch-frontend.mjs
- *   FRONTEND_REPO=../Storlane-Frontend node scripts/fetch-frontend.mjs
+ *   FRONTEND_REPO=../OpenList-Frontend node scripts/fetch-frontend.mjs
  *   FRONTEND_VERSION=4.2.6 node scripts/fetch-frontend.mjs
  *   FRONTEND_BUILD_FROM_SOURCE=1 node scripts/fetch-frontend.mjs
  *   node scripts/fetch-frontend.mjs
@@ -46,7 +43,7 @@ const DEST = path.join(ROOT, "dist")
 
 const OFFICIAL_REPO_URL =
   process.env.FRONTEND_GIT_URL ||
-  "https://github.com/jinzhenyi/Storlane-Frontend.git"
+  "https://github.com/OpenListTeam/OpenList-Frontend.git"
 const OFFICIAL_REPO_REF = process.env.FRONTEND_GIT_REF || "main"
 
 // 已发布 dist 的来源（默认路径）。ASSET_URLS 指向的 CDN 提供的正是这份 npm
@@ -54,13 +51,13 @@ const OFFICIAL_REPO_REF = process.env.FRONTEND_GIT_REF || "main"
 const REGISTRY_URL =
   process.env.FRONTEND_REGISTRY || "https://registry.npmjs.org"
 const PKG_NAME =
-  process.env.FRONTEND_PKG || "@storlane-frontend/storlane-frontend"
+  process.env.FRONTEND_PKG || "@openlist-frontend/openlist-frontend"
 
 // 多语言翻译包：官方前端仓库不提交非英文翻译（由 Crowdin 维护），随 release 发布。
 // 直接 pnpm build 只会得到英文界面，因此 CF/EO 构建时需在此拉取后再构建。
 const I18N_TAR_URL =
   process.env.I18N_URL ||
-  "https://github.com/jinzhenyi/Storlane-Frontend/releases/download/edge/i18n.tar.gz"
+  "https://github.com/OpenListTeam/OpenList-Frontend/releases/download/edge/i18n.tar.gz"
 
 function run(cmd, opts = {}) {
   console.log(`  > ${cmd}`)
@@ -120,7 +117,7 @@ function stampFrontendVersion(src) {
     )
     // 只信任官方前端包的版本号：FRONTEND_DIST 可能指向任意目录，
     // 误读（例如 worker 自身 package.json 的 4.2.3）会戳出错误的 CDN 版本。
-    if (!/storlane-frontend|openlist-frontend/i.test(pkg?.name || "")) return
+    if (!/openlist-frontend/i.test(pkg?.name || "")) return
     const version = pkg?.version
     if (!version) return
     const idx = path.join(DEST, "index.html")
@@ -151,7 +148,7 @@ function fetchI18n(repo) {
     console.warn("  [fetch-frontend] repo missing src/lang, skipping i18n fetch")
     return
   }
-  const tmpTar = path.join(os.tmpdir(), `storlane-i18n-${process.pid}.tar.gz`)
+  const tmpTar = path.join(os.tmpdir(), `openlist-i18n-${process.pid}.tar.gz`)
   console.log(`  Fetching i18n translations: ${I18N_TAR_URL}`)
   try {
     run(`curl -fL --retry 3 -o "${tmpTar}" "${I18N_TAR_URL}"`)
@@ -232,7 +229,7 @@ async function fetchPublishedDist() {
     throw new Error(`version ${version} is not published for ${PKG_NAME}`)
   }
 
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "storlane-frontend-npm-"))
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "openlist-frontend-npm-"))
   const tgz = path.join(tmp, "pkg.tgz")
   try {
     console.log(`  Downloading published dist: ${PKG_NAME}@${version}`)
@@ -267,31 +264,24 @@ async function main() {
     return
   }
 
-  // 3. 同级目录 ../Storlane-Frontend（monorepo 布局，自动探测）
-  const siblingRepo = path.resolve(ROOT, "..", "Storlane-Frontend")
+  // 3. 同级目录 ../OpenList-Frontend（monorepo 布局，自动探测）
+  const siblingRepo = path.resolve(ROOT, "..", "OpenList-Frontend")
   if (fs.existsSync(path.join(siblingRepo, "package.json"))) {
     console.log(`  Detected sibling official frontend repo: ${siblingRepo}`)
     buildLocalRepo(siblingRepo)
     return
   }
 
-  // 4. 下载 npm 上已发布的 dist（默认优先）
+  // 4. 下载 npm 上已发布的 dist（默认）
   //    从 main 现构建的产物哈希与 CDN 不一致，会让路径 A 失效、npmmirror 之类的
-  //    镜像完全不可用（详见文件头），故优先取已发布产物。
-  //    本 fork 未发布到 npm（404 / 无 dist-tags）时自动回退到 5 从 Git 现构建。
+  //    镜像完全不可用（详见文件头），故默认改为取已发布产物。
   if (process.env.FRONTEND_BUILD_FROM_SOURCE !== "1") {
-    try {
-      await fetchPublishedDist()
-      return
-    } catch (err) {
-      console.warn(
-        `  published dist unavailable (${err?.message || err}); falling back to source build`,
-      )
-    }
+    await fetchPublishedDist()
+    return
   }
 
-  // 5. 从 Git 克隆 main 并构建（未发布 npm 包时的默认路径，或 FRONTEND_BUILD_FROM_SOURCE=1 强制）
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "storlane-frontend-"))
+  // 5. 从 Git 克隆 main 并构建（FRONTEND_BUILD_FROM_SOURCE=1 时使用）
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "openlist-frontend-"))
   console.log(`  Cloning official frontend: ${OFFICIAL_REPO_URL}#${OFFICIAL_REPO_REF}`)
   try {
     run(

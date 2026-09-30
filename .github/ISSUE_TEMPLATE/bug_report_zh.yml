@@ -1,13 +1,13 @@
 name: "错误报告"
-description: 错误报告 / 问题（Storlane）
+description: 错误报告 / 问题（OpenList-Worker）
 title: "[BUG] 请修改标题为您遇到的问题"
 labels: [bug]
 body:
   - type: markdown
     attributes:
       value: |
-        感谢您花时间反馈问题，这会帮助 Storlane 变得更好。
-        提交前请先到[讨论区](https://github.com/jinzhenyi/Storlane/discussions)看看是否已有相同问题，避免重复。
+        感谢您花时间反馈问题，这会帮助 OpenList-Worker 变得更好。
+        提交前请先到[讨论区](https://github.com/OpenListTeam/OpenList-Worker/discussions)看看是否已有相同问题，避免重复。
 
   - type: checkboxes
     attributes:
@@ -32,7 +32,7 @@ body:
     id: platform
     attributes:
       label: 平台（必填）
-      description: 您将 Storlane 部署在哪个平台？
+      description: 您将 OpenList-Worker 部署在哪个平台？
       options:
         - Cloudflare Workers
         - Tencent EdgeOne Makers

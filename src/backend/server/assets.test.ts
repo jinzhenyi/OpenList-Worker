@@ -12,19 +12,19 @@ import {
 
 const env: any = {}
 
-/** 与官方前端产物同构的最小 HTML：含 STORLANE_CONFIG 与动态 base 脚本 */
+/** 与官方前端产物同构的最小 HTML：含 OPENLIST_CONFIG 与动态 base 脚本 */
 const INDEX_HTML = `<!doctype html>
 <html>
   <head>
     <meta name="frontend-version" content="4.2.6">
     <script>
-      window.STORLANE_CONFIG = {
+      window.OPENLIST_CONFIG = {
         cdn: undefined,
         base_path: undefined,
         api: undefined,
         main_color: undefined,
       }
-      window.__dynamic_base__ = window.STORLANE_CONFIG.cdn || ""
+      window.__dynamic_base__ = window.OPENLIST_CONFIG.cdn || ""
     </script>
     <script type="module" src="/assets/index-LOCAL.js"></script>
   </head>
@@ -234,7 +234,7 @@ test("injectCdnIntoHtml: CDN URL 中的 $ 不被当作特殊模式", () => {
 
 test("injectCdnIntoHtml: CDN URL 中的引号 / 反斜杠被转义", () => {
   // 注入值最终是内联脚本里的 JS 字符串字面量：未转义的 ' 会提前闭合字符串，
-  // window.STORLANE_CONFIG 语法报错 -> 整站白屏。
+  // window.OPENLIST_CONFIG 语法报错 -> 整站白屏。
   const cdn = "https://cdn.example.com/a'b\\c/dist"
   const out = injectCdnIntoHtml(INDEX_HTML, cdn)
   assert.doesNotMatch(out, /cdn: undefined/)

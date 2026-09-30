@@ -346,8 +346,8 @@ publicRouter.get("/settings", async (c) => {
   // Source: internal/bootstrap/data/setting.go + internal/conf/const.go
   const settingsObj: Record<string, string> = {
     // --- Site ---
-    title: "Storlane",
-    site_title: "Storlane",
+    title: "OpenList",
+    site_title: "OpenList",
     version: "v4.2.3",
     // 后端类型标识：前端据此在 GO / TS 模式间切换功能开关。
     // Go 版 OpenList 后端不返回此字段，前端缺省视为 "go"。
@@ -360,10 +360,8 @@ publicRouter.get("/settings", async (c) => {
     robots_txt: "User-agent: *\nAllow: /",
 
     // --- Appearance ---
-    logo:
-      "https://raw.githubusercontent.com/jinzhenyi/Storlane-Frontend/main/public/logo.svg",
-    favicon:
-      "https://raw.githubusercontent.com/jinzhenyi/Storlane-Frontend/main/public/logo.svg",
+    logo: "https://res.oplist.org/logo/logo.svg",
+    favicon: "https://res.oplist.org/logo/logo.svg",
     main_color: "#1890ff",
     hide_storage_details: "false",
     hide_storage_details_in_manage_page: "false",

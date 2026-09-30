@@ -48,7 +48,7 @@ export class ClientGithubReleases {
   private async get<T = any>(path: string): Promise<T> {
     const headers: Record<string, string> = {
       Accept: "application/vnd.github+json",
-      "User-Agent": "Storlane",
+      "User-Agent": "OpenList-TSWorker",
     }
     if (this.addition.token) headers["Authorization"] = `Bearer ${this.addition.token}`
     const resp = await fetch(`${API_BASE}${path}`, { headers })

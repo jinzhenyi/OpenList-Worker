@@ -84,7 +84,7 @@ s3Router.get("/", async (c) => {
       .join("\n")
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <ListAllMyBucketsResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
-  <Owner><ID>storlane</ID><DisplayName>storlane</DisplayName></Owner>
+  <Owner><ID>openlist</ID><DisplayName>openlist</DisplayName></Owner>
   <Buckets>
 ${buckets}
   </Buckets>

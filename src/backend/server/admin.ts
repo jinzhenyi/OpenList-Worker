@@ -129,7 +129,7 @@ export const normalizeDriver = (driverName: string): string => {
       d.toLowerCase().replace(/[^a-z0-9]/g, "") === norm,
   )
   if (matched) return matched
-  // Common Storlane aliases
+  // Common OpenList aliases
   if (norm.startsWith("115")) return "115Open"
   if (norm.startsWith("123")) return "123Pan"
   if (norm.includes("aliyun")) return "AliyundriveOpen"
@@ -4019,7 +4019,7 @@ const driverConfigs: Record<string, any> = {
       {
         name: "placeholder",
         type: "string",
-        default: ".storlane",
+        default: ".openlist",
         required: false,
       },
       {
@@ -4462,7 +4462,7 @@ adminRouter.post("/setting/reset_token", async (c) => {
   // `token` 设置是链接/下载签名密钥（对应 Go 的 sign.Instance()），
   // 变更后旧的下载链接签名立即失效——与 Go ResetToken 行为一致。
   //
-  // 注意：JWT 密钥来自 env.JWT_SECRET / 持久化的 storlane_jwt_secret，与这里的
+  // 注意：JWT 密钥来自 env.JWT_SECRET / 持久化的 openlist_jwt_secret，与这里的
   // `token` 设置无关，所以清 JWT 缓存**不会**让已签发的 JWT 失效；这里调用只是
   // 让进程内缓存与最新的 env/持久化值保持一致。
   const { resetJwtSecretCache } = await import("./middlewares")

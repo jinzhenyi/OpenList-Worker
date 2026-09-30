@@ -5,14 +5,14 @@ import { getDb } from "../internal/model/db"
  * 品牌资源 + CDN 静态资源路由。
  *
  * 背景：老前端（含 logo.svg / logo.png / favicon 静态文件）已移除，前端统一
- * 由官方 Storlane-Frontend 产物提供，但官方产物不包含 /logo.png、/favicon.png
+ * 由官方 OpenList-Frontend 产物提供，但官方产物不包含 /logo.png、/favicon.png
  * 等站点图标；而 /api/public/settings 返回的 logo/favicon 字段，以及早期已
  * 初始化数据库里保存的旧值，仍可能指向 /logo.png、/favicon.png 这些本地路径，
- * 若直接 404 会导致图标裂开。这里统一 302 重定向到 Storlane 品牌 logo，兼容多路径。
+ * 若直接 404 会导致图标裂开。这里统一 302 重定向到官方 CDN logo，兼容多路径，
+ * 且始终跟随官方最新 logo（不再内嵌旧 SVG 内容）。
  */
 
-const LOGO_URL =
-  "https://raw.githubusercontent.com/jinzhenyi/Storlane-Frontend/main/public/logo.svg"
+const LOGO_URL = "https://res.oplist.org/logo/logo.svg"
 
 export const assetsRouter = new Hono()
 
@@ -32,7 +32,7 @@ assetsRouter.get("/favicon.ico", redirectToLogo)
  * 前端静态资源 CDN 注入。
  *
  * 当配置了 ASSET_URLS 时，把 CDN 地址注入 index.html 的
- * window.STORLANE_CONFIG.cdn；前端 vite-plugin-dynamic-base 读取
+ * window.OPENLIST_CONFIG.cdn；前端 vite-plugin-dynamic-base 读取
  * window.__dynamic_base__（= cdn）后，浏览器直连 CDN 加载 JS/CSS/图片等资源，
  * 不再经 Worker 中转（对齐 Go 版 server/static/static.go）。
  *
@@ -65,9 +65,9 @@ assetsRouter.get("/favicon.ico", redirectToLogo)
  * 该头，浏览器场景下同样可用。
  *
  * 示例：
- *   ASSET_URLS = https://registry.npmmirror.com/@storlane-frontend/storlane-frontend/$version/files/dist
- *   ASSET_URLS = https://cdn.jsdelivr.net/npm/@storlane-frontend/storlane-frontend@$version/dist
- *   ASSET_URLS = https://unpkg.com/@storlane-frontend/storlane-frontend@$version/dist
+ *   ASSET_URLS = https://registry.npmmirror.com/@openlist-frontend/openlist-frontend/$version/files/dist
+ *   ASSET_URLS = https://cdn.jsdelivr.net/npm/@openlist-frontend/openlist-frontend@$version/dist
+ *   ASSET_URLS = https://unpkg.com/@openlist-frontend/openlist-frontend@$version/dist
  */
 
 /** CDN index.html 的模块级缓存：每个 isolate 每 TTL 最多一次外呼。
@@ -135,7 +135,7 @@ export async function resolveCdnUrl(env: any, html?: string): Promise<string> {
 }
 
 /**
- * 把已解析的 CDN 地址注入 HTML 的 window.STORLANE_CONFIG.cdn。
+ * 把已解析的 CDN 地址注入 HTML 的 window.OPENLIST_CONFIG.cdn。
  * 前端 vite-plugin-dynamic-base 读取 window.__dynamic_base__（= cdn），
  * 据此前缀所有静态资源 URL，实现从 CDN 加载。
  */
@@ -143,7 +143,7 @@ export function injectCdnIntoHtml(html: string, cdn: string): string {
   if (!cdn) return html
   // 1) 用函数替换，避免 cdn URL 里的 $ 被 String.replace 当成特殊模式（$&、$1…）；
   // 2) 注入值是拼进内联脚本的 JS 字符串字面量，必须转义：URL 里若出现 ' 或 \（
-  //    或换行）会提前闭合字符串，让 window.STORLANE_CONFIG 语法报错、整站白屏。
+  //    或换行）会提前闭合字符串，让 window.OPENLIST_CONFIG 语法报错、整站白屏。
   //    注意 Go 版（fmt.Sprintf("cdn: '%s'")）没有处理这一点，这里不与它的缺陷对齐。
   const value = cdn
     .replace(/\\/g, "\\\\")

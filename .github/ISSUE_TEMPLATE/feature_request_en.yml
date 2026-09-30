@@ -1,13 +1,13 @@
 name: "Feature Request"
-description: Feature Request / Enhancement (Storlane)
+description: Feature Request / Enhancement (OpenList-Worker)
 title: "[Feature] Please modify the title to your feature name"
 labels: [enhancement]
 body:
   - type: markdown
     attributes:
       value: |
-        Thank you for suggesting a new idea for Storlane — it helps make Storlane better.
-        Before submitting, please check the [discussions](https://github.com/jinzhenyi/Storlane/discussions) for a similar proposal to avoid duplicates.
+        Thank you for suggesting a new idea for OpenList-Worker — it helps make OpenList-Worker better.
+        Before submitting, please check the [discussions](https://github.com/OpenListTeam/OpenList-Worker/discussions) for a similar proposal to avoid duplicates.
 
   - type: checkboxes
     attributes:

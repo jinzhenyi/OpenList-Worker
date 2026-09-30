@@ -66,7 +66,7 @@ test("isDbShell: 仅有分享/元数据/插件的库不是空壳", () => {
 test("isDbShell: 默认空库（defaultDb 克隆）被判定为空壳", () => {
   // 与 loadDb() 的兜底分支形状一致：各实体均为空数组。
   const shell = {
-    settings: [{ key: "site_title", value: "Storlane" }],
+    settings: [{ key: "site_title", value: "OpenList" }],
     users: [],
     storages: [],
     shares: [],

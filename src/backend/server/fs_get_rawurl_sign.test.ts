@@ -35,7 +35,7 @@ const tmpRoots: string[] = []
 
 /** 建一个临时目录并放入一个真实文件，挂成 Local 存储的根。 */
 function makeLocalRoot(): string {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "storlane-rawurl-sign-"))
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "openlist-rawurl-sign-"))
   fs.writeFileSync(path.join(root, "a.exe"), "MZ")
   tmpRoots.push(root)
   return root

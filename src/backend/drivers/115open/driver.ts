@@ -12,7 +12,7 @@ import { Pan115Addition, Pan115File } from "./types"
 import { Pan115Client, ERR_OBJECT_NOT_FOUND } from "./util"
 
 /** OpenList Go base.UserAgent（与 Go 驱动一致，115 防盗链校验通过率高） */
-const STORLANE_UA =
+const OPENLIST_UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Safari/537.36 Chrome/142.0.0.0 OpenList/425.6.30"
 
 /** CF Workers 免费版单次 invocation 子请求预算（留余量） */
@@ -304,18 +304,18 @@ export class Pan115Driver implements StorageDriver {
     if (file.fc !== "0" && file.pc) {
       try {
         // 链接缓存（Go LinkCacheMode=UA）：同一 文件+UA 复用链接，节省 downurl 配额
-        const cacheKey = `${file.fid}|${STORLANE_UA}`
+        const cacheKey = `${file.fid}|${OPENLIST_UA}`
         const cached = this.linkCache.get(cacheKey)
         if (cached && cached.expire > Date.now()) {
           item.raw_url = cached.url
-          item.raw_url_headers = { "User-Agent": STORLANE_UA }
+          item.raw_url_headers = { "User-Agent": OPENLIST_UA }
         } else {
           if (!this.reserve()) throw new Error("subrequest budget exceeded")
-          const resp = await this.client.downUrl(file.pc, STORLANE_UA)
+          const resp = await this.client.downUrl(file.pc, OPENLIST_UA)
           const entry = resp[file.fid]
           if (entry?.url?.url) {
             item.raw_url = entry.url.url
-            item.raw_url_headers = { "User-Agent": STORLANE_UA }
+            item.raw_url_headers = { "User-Agent": OPENLIST_UA }
             this.linkCache.set(cacheKey, {
               url: entry.url.url,
               expire: Date.now() + Pan115Driver.LINK_TTL_MS,

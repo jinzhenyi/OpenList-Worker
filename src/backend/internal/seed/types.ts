@@ -238,7 +238,7 @@ export function normalizeSeed(input: unknown): SharingSeed {
     name,
     comment: text(value.comment),
     created_at: text(value.created_at) || new Date().toISOString(),
-    created_by: text(value.created_by) || "Storlane",
+    created_by: text(value.created_by) || "OpenList",
     piece_size: pieceSize,
     trackers: Array.isArray(value.trackers)
       ? value.trackers.map(text).filter(Boolean)

@@ -71,7 +71,7 @@ test("配置 ASSET_URLS 时，仅四个静态目录 302 到 CDN，且 $version �
 
 test("ASSET_URLS 含 $version 占位符时不留占位符（取不到版本则 latest）", async () => {
   const env = {
-    ASSET_URLS: "https://cdn.example.com/storlane/$version/files/dist",
+    ASSET_URLS: "https://cdn.example.com/openlist/$version/files/dist",
   }
   const res = await appWithSpaFallback().request(
     "/assets/app.js",
@@ -84,11 +84,8 @@ test("ASSET_URLS 含 $version 占位符时不留占位符（取不到版本则 l
   assert.match(location, /\/assets\/app\.js$/)
 })
 
-test("logo / favicon 仍然重定向到 Storlane logo", async () => {
+test("logo / favicon 仍然重定向到官方 logo", async () => {
   const res = await appWithSpaFallback().request("/favicon.ico", { method: "GET" })
   assert.equal(res.status, 302)
-  assert.equal(
-    res.headers.get("location"),
-    "https://raw.githubusercontent.com/jinzhenyi/Storlane-Frontend/main/public/logo.svg",
-  )
+  assert.equal(res.headers.get("location"), "https://res.oplist.org/logo/logo.svg")
 })

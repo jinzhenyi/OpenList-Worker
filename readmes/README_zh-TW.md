@@ -1,15 +1,15 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/StorlaneTeam/Logo/main/logo.svg" width="128" height="128" alt="logo" />
+  <img src="https://raw.githubusercontent.com/OpenListTeam/Logo/main/logo.svg" width="128" height="128" alt="logo" />
 
-  <p><em>Storlane 是一個多功能的目錄列表工具，支援數十種網盤檔案掛載和檔案預覽/下載/分享等功能</em></p>
+  <p><em>OpenList 是一個多功能的目錄列表工具，支援數十種網盤檔案掛載和檔案預覽/下載/分享等功能</em></p>
   <p>本倉庫是官方 <a href="https://github.com/OpenListTeam/OpenList">OpenListTeam/OpenList</a> 專案的 TypeScript + Serverless 架構移植版</p>
   <p>基於 Cloudflare Workers / EdgeOne Cloud Function / Alibaba Cloud ESA 運行</p>
 
-<a href="https://github.com/jinzhenyi/Storlane/blob/main/LICENSE"><img src="https://img.shields.io/github/license/jinzhenyi/Storlane" alt="License" /></a>
-<a href="https://github.com/jinzhenyi/Storlane/actions/workflows/edgeone-artifact-guard.yml"><img src="https://img.shields.io/github/actions/workflow/status/jinzhenyi/Storlane/edgeone-artifact-guard.yml?branch=main" alt="Build status" /></a>
-<a href="https://github.com/jinzhenyi/Storlane/releases"><img src="https://img.shields.io/github/release/jinzhenyi/Storlane" alt="latest version" /></a>
-<a href="https://github.com/jinzhenyi/Storlane/discussions"><img src="https://img.shields.io/github/discussions/jinzhenyi/Storlane?color=%23ED8936" alt="discussions" /></a>
-<a href="https://github.com/jinzhenyi/Storlane/releases"><img src="https://img.shields.io/github/downloads/jinzhenyi/Storlane/total?color=%239F7AEA&logo=github" alt="Downloads" /></a>
+<a href="https://github.com/OpenListTeam/OpenList-Worker/blob/main/LICENSE"><img src="https://img.shields.io/github/license/OpenListTeam/OpenList-Worker" alt="License" /></a>
+<a href="https://github.com/OpenListTeam/OpenList-Worker/actions/workflows/edgeone-artifact-guard.yml"><img src="https://img.shields.io/github/actions/workflow/status/OpenListTeam/OpenList-Worker/edgeone-artifact-guard.yml?branch=main" alt="Build status" /></a>
+<a href="https://github.com/OpenListTeam/OpenList-Worker/releases"><img src="https://img.shields.io/github/release/OpenListTeam/OpenList-Worker" alt="latest version" /></a>
+<a href="https://github.com/OpenListTeam/OpenList-Worker/discussions"><img src="https://img.shields.io/github/discussions/OpenListTeam/OpenList-Worker?color=%23ED8936" alt="discussions" /></a>
+<a href="https://github.com/OpenListTeam/OpenList-Worker/releases"><img src="https://img.shields.io/github/downloads/OpenListTeam/OpenList-Worker/total?color=%239F7AEA&logo=github" alt="Downloads" /></a>
 
 📘 [使用文件](https://doc.oplist.org) · 🌏 [使用文件（中國大陸）](https://doc.oplist.org.cn)  · ⚖️ [使用條款](https://doc.oplist.org/terms)  · 🔒 [隱私政策](https://doc.oplist.org/privacy)
 
@@ -21,7 +21,7 @@
 
 [Português](README_pt.md) | [Русский](README_ru.md) | [العربية](README_ar.md) | [Italiano](README_it.md) | [हिन्दी](README_hi.md) | [Español](README_es.md)
 
-[上游專案](https://github.com/OpenListTeam/OpenList-Worker) · [貢獻指南](https://github.com/jinzhenyi/Storlane/blob/main/CONTRIBUTING.md) · [行為準則](https://github.com/jinzhenyi/Storlane/blob/main/CODE_OF_CONDUCT.md) · [許可證](./LICENSE)
+[上游專案](https://github.com/OpenListTeam/OpenList) · [貢獻指南](https://github.com/OpenListTeam/OpenList-Worker/blob/main/CONTRIBUTING.md) · [行為準則](https://github.com/OpenListTeam/OpenList-Worker/blob/main/CODE_OF_CONDUCT.md) · [許可證](./LICENSE)
 
 [🌎 全球 Demo](https://new.oplist.org) 　|　 [🇨🇳 中國 Demo](https://new.oplist.org.cn)
 
@@ -37,12 +37,12 @@
 
 | EdgeOne Makers · 國際站 | EdgeOne Makers · 中國站 | Cloudflare Workers · 全球站 |
 | :---: | :---: | :---: |
-| [![使用 EdgeOne 部署](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/pages/new?project-name=storlane&repository-url=https://github.com/jinzhenyi/Storlane&install-command=pnpm%20install%20--no-frozen-lockfile&build-command=pnpm%20run%20build&output-directory=dist&env=JWT_SECRET) | [![使用 EdgeOne 部署](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://console.cloud.tencent.com/edgeone/pages/new?project-name=storlane&repository-url=https://github.com/jinzhenyi/Storlane&install-command=pnpm%20install%20--no-frozen-lockfile&build-command=pnpm%20run%20build&output-directory=dist&env=JWT_SECRET) | [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/jinzhenyi/Storlane) |
+| [![使用 EdgeOne 部署](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/pages/new?project-name=openlist-tsworker&repository-url=https://github.com/OpenListTeam/OpenList-Worker&install-command=pnpm%20install%20--no-frozen-lockfile&build-command=pnpm%20run%20build&output-directory=dist&env=JWT_SECRET) | [![使用 EdgeOne 部署](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://console.cloud.tencent.com/edgeone/pages/new?project-name=openlist-tsworker&repository-url=https://github.com/OpenListTeam/OpenList-Worker&install-command=pnpm%20install%20--no-frozen-lockfile&build-command=pnpm%20run%20build&output-directory=dist&env=JWT_SECRET) | [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/OpenListTeam/OpenList-Worker) |
 
 </div>
 
 > [!IMPORTANT]
-> - 若 Cloudflare 提示`無法取得儲存庫內容`，則您需要先 [Fork](https://github.com/jinzhenyi/Storlane/fork) 本專案，再透過連接到 Github 倉庫功能部署
+> - 若 Cloudflare 提示`無法取得儲存庫內容`，則您需要先 [Fork](https://github.com/OpenListTeam/OpenList-Worker/fork) 本專案，再透過連接到 Github 倉庫功能部署
 > - 部署完成後配置環境變數： **EdgeOne**：[國際站](https://console.edgeone.ai/makers) · [中國站](https://console.cloud.tencent.com/edgeone/makers)；**Cloudflare**：[Worker 後台](https://dash.cloudflare.com/)，環境變數：
 >   - `DB_FORMAT`: 資料儲存格式：`map` (預設，整物件 JSON) / `key` (分 key 儲存) / `sql` (關聯表，與 Go 後端一致)
 >   - `DB_DRIVER`: 資料庫驅動：`auto` (預設，自動偵測) / `blob` / `cfkv` / `kv` / `d1` / `mysql`
@@ -51,9 +51,9 @@
 
 ## 功能簡介
 
-Storlane 是一個運行於邊緣運算平台的多儲存聚合檔案列表與管理系統，可將分散在不同網盤、物件儲存與協定服務中的檔案統一到一個介面，進行瀏覽、預覽、下載與管理。
+OpenList 是一個運行於邊緣運算平台的多儲存聚合檔案列表與管理系統，可將分散在不同網盤、物件儲存與協定服務中的檔案統一到一個介面，進行瀏覽、預覽、下載與管理。
 
-Storlane 是官方 [OpenListTeam/OpenList](https://github.com/OpenListTeam/OpenList) 專案的 TypeScript + Serverless 移植版，後端由 Go 重寫為運行於 Workers 的 TypeScript 服務，前端保持一致的介面與互動體驗。
+OpenList-Worker 是官方 [OpenListTeam/OpenList](https://github.com/OpenListTeam/OpenList) 專案的 TypeScript + Serverless 移植版，後端由 Go 重寫為運行於 Workers 的 TypeScript 服務，前端保持一致的介面與互動體驗。
 
 ### 儲存聚合
 
@@ -63,7 +63,7 @@ Storlane 是官方 [OpenListTeam/OpenList](https://github.com/OpenListTeam/OpenL
 - **國際網盤**：Google Drive（相簿）、OneDrive（應用/分享連結）、Dropbox、MEGA、MediaFire、Proton Drive、Yandex Disk、Degoo、Bunny Storage、TeraBox 等
 - **物件儲存**：S3 相容（AWS/OSS/COS/MinIO 等）、又拍雲 USS、Azure Blob、WebDAV、FTP、SFTP、SMB、IPFS 等
 - **程式碼託管**：GitHub、GitHub Releases、CNB Releases
-- **網盤程式**：Storlane（分享）、AList V3、Cloudreve V3/V4、Kodbox（可道雲）、Seafile、Teldrive、Febbox 等
+- **網盤程式**：OpenList（分享）、AList V3、Cloudreve V3/V4、Kodbox（可道雲）、Seafile、Teldrive、Febbox 等
 - **其他驅動**：網易雲音樂、Misskey、Emby、Cloudflare 圖床等
 
 除上述真實儲存外，還提供 `Local`、`Alias`、`UrlTree`、`AutoIndex`、`Strm`、`Crypt`、`Virtual`、`Chunk` 等虛擬/功能型驅動，可用於本地掛載、位址別名、URL 列表、加密儲存與分片等場景。
@@ -152,17 +152,17 @@ pnpm run deploy:worker
 
 在使用過程中遇到問題，可透過以下管道取得幫助：
 
-- 🐛 **提交 Bug 或功能請求**：請前往 [_Issues_](https://github.com/jinzhenyi/Storlane/issues)
-- 💬 **一般性問題與交流**：請前往 [_Discussions_](https://github.com/jinzhenyi/Storlane/discussions) 討論區
+- 🐛 **提交 Bug 或功能請求**：請前往 [_Issues_](https://github.com/OpenListTeam/OpenList-Worker/issues)
+- 💬 **一般性問題與交流**：請前往 [_Discussions_](https://github.com/OpenListTeam/OpenList/discussions) 討論區
 
 ## 開源許可
 
-`Storlane` 是基於 [AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.txt) 許可證的開源軟體。
+`OpenList` 是基於 [AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.txt) 許可證的開源軟體。
 
 
 ## 聯絡我們
 
-🌐 [@GitHub](https://github.com/StorlaneTeam) · ✈️ [Telegram 交流群](https://t.me/StorlaneTeam) · ✈️ [Telegram 頻道](https://t.me/StorlaneOfficial)
+🌐 [@GitHub](https://github.com/OpenListTeam) · ✈️ [Telegram 交流群](https://t.me/OpenListTeam) · ✈️ [Telegram 頻道](https://t.me/OpenListOfficial)
 
 ## 貢獻列表
 
@@ -170,7 +170,6 @@ pnpm run deploy:worker
 
 - [Alist](https://github.com/AlistGo/alist) 專案作者及全體貢獻者
 - [OpenList](https://github.com/OpenListTeam/OpenList)（Go 版）專案作者及全體貢獻者
-- [OpenList-Worker](https://github.com/OpenListTeam/OpenList-Worker) (TypeScript + Serverless 版)
 - 本專案全體貢獻者：
 
-[![Contributors](https://contrib.rocks/image?repo=jinzhenyi/Storlane)](https://github.com/jinzhenyi/Storlane/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=OpenListTeam/OpenList-Worker)](https://github.com/OpenListTeam/OpenList-Worker/graphs/contributors)

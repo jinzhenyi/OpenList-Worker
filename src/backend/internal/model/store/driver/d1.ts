@@ -3,8 +3,7 @@
  * 
  * 环境变量：
  * - DB (Cloudflare D1 binding)
- * - STORLANE_DB (别名)
- * - OPENLIST_DB（旧品牌别名，仅兼容）
+ * - OPENLIST_DB (别名)
  */
 import type { Driver } from "../types"
 import { buildDdl, KV_SCHEMA_SQLITE } from "../schema"
@@ -33,7 +32,7 @@ function isD1Like(b: any): boolean {
 function getD1(env?: any): any | null {
   const g = typeof globalThis !== "undefined" ? (globalThis as any) : {}
 
-  for (const name of ["DB", "STORLANE_DB", "OPENLIST_DB"]) {
+  for (const name of ["DB", "OPENLIST_DB"]) {
     const fromEnv = env?.[name]
     if (isD1Like(fromEnv)) return fromEnv
     const fromGlobal = g?.[name]
@@ -154,8 +153,7 @@ export const d1Driver: Driver = {
         connected: false,
         platform: "Cloudflare D1",
         mode: "d1",
-        error:
-          "D1 binding not found (expected env.DB, env.STORLANE_DB or env.OPENLIST_DB)",
+        error: "D1 binding not found (expected env.DB or env.OPENLIST_DB)",
       }
     }
 

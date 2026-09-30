@@ -1,5 +1,5 @@
 /**
- * Generic utility functions for Storlane backend.
+ * Generic utility functions for OpenList backend.
  */
 
 // Simple range function like Go's range

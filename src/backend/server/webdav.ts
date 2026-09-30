@@ -96,7 +96,7 @@ webdavRouter.all("/*", async (c) => {
   const user = await webdavAuth(c)
   if (!user) {
     return c.text("Unauthorized", 401, {
-      "WWW-Authenticate": 'Basic realm="Storlane"',
+      "WWW-Authenticate": 'Basic realm="OpenList"',
     })
   }
   const canRead = can(user, PermissionBit.WEBDAV_READ)

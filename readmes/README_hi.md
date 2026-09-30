@@ -1,15 +1,15 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/StorlaneTeam/Logo/main/logo.svg" width="128" height="128" alt="logo" />
+  <img src="https://raw.githubusercontent.com/OpenListTeam/Logo/main/logo.svg" width="128" height="128" alt="logo" />
 
-  <p><em>Storlane एक सुविधा-संपन्न निर्देशिका सूची उपकरण है जो दर्जनों क्लाउड ड्राइव माउंट करने और फ़ाइल पूर्वावलोकन/डाउनलोड/साझाकरण आदि का समर्थन करता है</em></p>
+  <p><em>OpenList एक सुविधा-संपन्न निर्देशिका सूची उपकरण है जो दर्जनों क्लाउड ड्राइव माउंट करने और फ़ाइल पूर्वावलोकन/डाउनलोड/साझाकरण आदि का समर्थन करता है</em></p>
   <p>यह रिपॉजिटरी आधिकारिक <a href="https://github.com/OpenListTeam/OpenList">OpenListTeam/OpenList</a> परियोजना का TypeScript + Serverless आर्किटेक्चर पोर्ट है</p>
   <p>Cloudflare Workers / EdgeOne Cloud Function / Alibaba Cloud ESA पर चलता है</p>
 
-<a href="https://github.com/jinzhenyi/Storlane/blob/main/LICENSE"><img src="https://img.shields.io/github/license/jinzhenyi/Storlane" alt="License" /></a>
-<a href="https://github.com/jinzhenyi/Storlane/actions/workflows/edgeone-artifact-guard.yml"><img src="https://img.shields.io/github/actions/workflow/status/jinzhenyi/Storlane/edgeone-artifact-guard.yml?branch=main" alt="Build status" /></a>
-<a href="https://github.com/jinzhenyi/Storlane/releases"><img src="https://img.shields.io/github/release/jinzhenyi/Storlane" alt="latest version" /></a>
-<a href="https://github.com/jinzhenyi/Storlane/discussions"><img src="https://img.shields.io/github/discussions/jinzhenyi/Storlane?color=%23ED8936" alt="discussions" /></a>
-<a href="https://github.com/jinzhenyi/Storlane/releases"><img src="https://img.shields.io/github/downloads/jinzhenyi/Storlane/total?color=%239F7AEA&logo=github" alt="Downloads" /></a>
+<a href="https://github.com/OpenListTeam/OpenList-Worker/blob/main/LICENSE"><img src="https://img.shields.io/github/license/OpenListTeam/OpenList-Worker" alt="License" /></a>
+<a href="https://github.com/OpenListTeam/OpenList-Worker/actions/workflows/edgeone-artifact-guard.yml"><img src="https://img.shields.io/github/actions/workflow/status/OpenListTeam/OpenList-Worker/edgeone-artifact-guard.yml?branch=main" alt="Build status" /></a>
+<a href="https://github.com/OpenListTeam/OpenList-Worker/releases"><img src="https://img.shields.io/github/release/OpenListTeam/OpenList-Worker" alt="latest version" /></a>
+<a href="https://github.com/OpenListTeam/OpenList-Worker/discussions"><img src="https://img.shields.io/github/discussions/OpenListTeam/OpenList-Worker?color=%23ED8936" alt="discussions" /></a>
+<a href="https://github.com/OpenListTeam/OpenList-Worker/releases"><img src="https://img.shields.io/github/downloads/OpenListTeam/OpenList-Worker/total?color=%239F7AEA&logo=github" alt="Downloads" /></a>
 
 📘 [उपयोग दस्तावेज़](https://doc.oplist.org) · 🌏 [उपयोग दस्तावेज़（मुख्यभूमि चीन）](https://doc.oplist.org.cn)  · ⚖️ [उपयोग की शर्तें](https://doc.oplist.org/terms)  · 🔒 [गोपनीयता नीति](https://doc.oplist.org/privacy)
 
@@ -21,7 +21,7 @@
 
 [Português](README_pt.md) | [Русский](README_ru.md) | [العربية](README_ar.md) | [Italiano](README_it.md) | हिन्दी | [Español](README_es.md)
 
-[अपस्ट्रीम परियोजना](https://github.com/OpenListTeam/OpenList-Worker) · [योगदान मार्गदर्शिका](https://github.com/jinzhenyi/Storlane/blob/main/CONTRIBUTING.md) · [आचार संहिता](https://github.com/jinzhenyi/Storlane/blob/main/CODE_OF_CONDUCT.md) · [लाइसेंस](./LICENSE)
+[अपस्ट्रीम परियोजना](https://github.com/OpenListTeam/OpenList) · [योगदान मार्गदर्शिका](https://github.com/OpenListTeam/OpenList-Worker/blob/main/CONTRIBUTING.md) · [आचार संहिता](https://github.com/OpenListTeam/OpenList-Worker/blob/main/CODE_OF_CONDUCT.md) · [लाइसेंस](./LICENSE)
 
 [🌎 वैश्विक डेमो](https://new.oplist.org) 　|　 [🇨🇳 चीन डेमो](https://new.oplist.org.cn)
 
@@ -37,12 +37,12 @@
 
 | EdgeOne Makers · अंतर्राष्ट्रीय | EdgeOne Makers · चीन | Cloudflare Workers · वैश्विक |
 | :---: | :---: | :---: |
-| [![EdgeOne पर तैनात करें](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/pages/new?project-name=storlane&repository-url=https://github.com/jinzhenyi/Storlane&install-command=pnpm%20install%20--no-frozen-lockfile&build-command=pnpm%20run%20build&output-directory=dist&env=JWT_SECRET) | [![EdgeOne पर तैनात करें](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://console.cloud.tencent.com/edgeone/pages/new?project-name=storlane&repository-url=https://github.com/jinzhenyi/Storlane&install-command=pnpm%20install%20--no-frozen-lockfile&build-command=pnpm%20run%20build&output-directory=dist&env=JWT_SECRET) | [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/jinzhenyi/Storlane) |
+| [![EdgeOne पर तैनात करें](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/pages/new?project-name=openlist-tsworker&repository-url=https://github.com/OpenListTeam/OpenList-Worker&install-command=pnpm%20install%20--no-frozen-lockfile&build-command=pnpm%20run%20build&output-directory=dist&env=JWT_SECRET) | [![EdgeOne पर तैनात करें](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://console.cloud.tencent.com/edgeone/pages/new?project-name=openlist-tsworker&repository-url=https://github.com/OpenListTeam/OpenList-Worker&install-command=pnpm%20install%20--no-frozen-lockfile&build-command=pnpm%20run%20build&output-directory=dist&env=JWT_SECRET) | [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/OpenListTeam/OpenList-Worker) |
 
 </div>
 
 > [!IMPORTANT]
-> - यदि Cloudflare `रिपॉजिटरी सामग्री प्राप्त नहीं कर सकता` दिखाता है, तो पहले इस परियोजना को [Fork](https://github.com/jinzhenyi/Storlane/fork) करें, फिर Github रिपॉजिटरी से कनेक्ट करके तैनात करें
+> - यदि Cloudflare `रिपॉजिटरी सामग्री प्राप्त नहीं कर सकता` दिखाता है, तो पहले इस परियोजना को [Fork](https://github.com/OpenListTeam/OpenList-Worker/fork) करें, फिर Github रिपॉजिटरी से कनेक्ट करके तैनात करें
 > - तैनाती के बाद पर्यावरण चर कॉन्फ़िगर करें: **EdgeOne**: [अंतर्राष्ट्रीय कंसोल](https://console.edgeone.ai/makers) · [चीन कंसोल](https://console.cloud.tencent.com/edgeone/makers); **Cloudflare**: [Worker डैशबोर्ड](https://dash.cloudflare.com/)। पर्यावरण चर:
 >   - `DB_FORMAT`: डेटा संग्रहण प्रारूप: `map` (डिफ़ॉल्ट, संपूर्ण ऑब्जेक्ट JSON) / `key` (कुंजी-आधारित संग्रहण) / `sql` (रिलेशनल टेबल, Go बैकएंड संगत)
 >   - `DB_DRIVER`: डेटाबेस ड्राइवर: `auto` (डिफ़ॉल्ट, स्वतः पहचान) / `blob` / `cfkv` / `kv` / `d1` / `mysql`
@@ -51,9 +51,9 @@
 
 ## विशेषताएँ
 
-Storlane एक बहु-स्टोरेज एग्रीगेशन फ़ाइल सूची और प्रबंधन प्रणाली है जो एज कंप्यूटिंग प्लेटफ़ॉर्म पर चलती है। यह विभिन्न क्लाउड ड्राइव, ऑब्जेक्ट स्टोरेज और प्रोटोकॉल सेवाओं में बिखरी फ़ाइलों को एक ही इंटरफ़ेस में एकीकृत करती है, जिससे ब्राउज़िंग, पूर्वावलोकन, डाउनलोड और प्रबंधन संभव होता है।
+OpenList एक बहु-स्टोरेज एग्रीगेशन फ़ाइल सूची और प्रबंधन प्रणाली है जो एज कंप्यूटिंग प्लेटफ़ॉर्म पर चलती है। यह विभिन्न क्लाउड ड्राइव, ऑब्जेक्ट स्टोरेज और प्रोटोकॉल सेवाओं में बिखरी फ़ाइलों को एक ही इंटरफ़ेस में एकीकृत करती है, जिससे ब्राउज़िंग, पूर्वावलोकन, डाउनलोड और प्रबंधन संभव होता है।
 
-Storlane आधिकारिक [OpenListTeam/OpenList](https://github.com/OpenListTeam/OpenList) परियोजना का TypeScript + Serverless पोर्ट है। बैकएंड को Go से Workers पर चलने वाली TypeScript सेवा में फिर से लिखा गया है, जबकि फ्रंटएंड एक सुसंगत इंटरफ़ेस और इंटरैक्शन अनुभव बनाए रखता है।
+OpenList-Worker आधिकारिक [OpenListTeam/OpenList](https://github.com/OpenListTeam/OpenList) परियोजना का TypeScript + Serverless पोर्ट है। बैकएंड को Go से Workers पर चलने वाली TypeScript सेवा में फिर से लिखा गया है, जबकि फ्रंटएंड एक सुसंगत इंटरफ़ेस और इंटरैक्शन अनुभव बनाए रखता है।
 
 ### स्टोरेज एग्रीगेशन
 
@@ -63,7 +63,7 @@ Storlane आधिकारिक [OpenListTeam/OpenList](https://github.com/Ope
 - **अंतर्राष्ट्रीय क्लाउड ड्राइव**: Google Drive（एल्बम）、OneDrive（ऐप/शेयर लिंक）、Dropbox、MEGA、MediaFire、Proton Drive、Yandex Disk、Degoo、Bunny Storage、TeraBox आदि
 - **ऑब्जेक्ट स्टोरेज**: S3-संगत（AWS/OSS/COS/MinIO आदि）、UpYun USS、Azure Blob、WebDAV、FTP、SFTP、SMB、IPFS आदि
 - **कोड होस्टिंग**: GitHub、GitHub Releases、CNB Releases
-- **क्लाउड ड्राइव प्रोग्राम**: Storlane（शेयर）、AList V3、Cloudreve V3/V4、Kodbox、Seafile、Teldrive、Febbox आदि
+- **क्लाउड ड्राइव प्रोग्राम**: OpenList（शेयर）、AList V3、Cloudreve V3/V4、Kodbox、Seafile、Teldrive、Febbox आदि
 - **अन्य ड्राइवर**: Netease Music、Misskey、Emby、Cloudflare इमेज होस्टिंग आदि
 
 उपरोक्त वास्तविक स्टोरेज के अलावा, स्थानीय माउंट, पता उपनाम, URL सूची, एन्क्रिप्टेड स्टोरेज और विभाजन जैसे परिदृश्यों के लिए `Local`、`Alias`、`UrlTree`、`AutoIndex`、`Strm`、`Crypt`、`Virtual`、`Chunk` जैसे वर्चुअल/कार्यात्मक ड्राइवर भी प्रदान किए गए हैं।
@@ -152,17 +152,17 @@ pnpm run deploy:worker
 
 उपयोग के दौरान समस्या आने पर, निम्नलिखित चैनलों से सहायता प्राप्त कर सकते हैं:
 
-- 🐛 **बग रिपोर्ट या सुविधा अनुरोध सबमिट करें**: [_Issues_](https://github.com/jinzhenyi/Storlane/issues) पर जाएँ
-- 💬 **सामान्य प्रश्न और संवाद**: [_Discussions_](https://github.com/jinzhenyi/Storlane/discussions) फ़ोरम पर जाएँ
+- 🐛 **बग रिपोर्ट या सुविधा अनुरोध सबमिट करें**: [_Issues_](https://github.com/OpenListTeam/OpenList-Worker/issues) पर जाएँ
+- 💬 **सामान्य प्रश्न और संवाद**: [_Discussions_](https://github.com/OpenListTeam/OpenList/discussions) फ़ोरम पर जाएँ
 
 ## लाइसेंस
 
-`Storlane` [AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.txt) लाइसेंस के तहत ओपन-सोर्स सॉफ़्टवेयर है।
+`OpenList` [AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.txt) लाइसेंस के तहत ओपन-सोर्स सॉफ़्टवेयर है।
 
 
 ## संपर्क करें
 
-🌐 [@GitHub](https://github.com/StorlaneTeam) · ✈️ [Telegram समूह](https://t.me/StorlaneTeam) · ✈️ [Telegram चैनल](https://t.me/StorlaneOfficial)
+🌐 [@GitHub](https://github.com/OpenListTeam) · ✈️ [Telegram समूह](https://t.me/OpenListTeam) · ✈️ [Telegram चैनल](https://t.me/OpenListOfficial)
 
 ## योगदानकर्ता
 
@@ -170,7 +170,6 @@ pnpm run deploy:worker
 
 - [Alist](https://github.com/AlistGo/alist) परियोजना के लेखक और सभी योगदानकर्ता
 - [OpenList](https://github.com/OpenListTeam/OpenList)（Go संस्करण）परियोजना के लेखक और सभी योगदानकर्ता
-- [OpenList-Worker](https://github.com/OpenListTeam/OpenList-Worker) (TypeScript + Serverless 版)
 - इस परियोजना के सभी योगदानकर्ता:
 
-[![Contributors](https://contrib.rocks/image?repo=jinzhenyi/Storlane)](https://github.com/jinzhenyi/Storlane/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=OpenListTeam/OpenList-Worker)](https://github.com/OpenListTeam/OpenList-Worker/graphs/contributors)
