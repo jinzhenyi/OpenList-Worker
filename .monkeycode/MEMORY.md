@@ -51,7 +51,7 @@ This file records user instructions, preferences, and project knowledge for refe
 - Context: Discovered by Agent while reverting the Storlane rebrand back to OpenList
 - Category: Operations & Deployment
 - Instructions:
-  - 品牌已从 Storlane **回退为 OpenList**：代码/README/多语言/logo/包名/KV 键均恢复（工作树等于品牌化前 `cfd28fe`）。前端构建已切回上游 `OpenListTeam/OpenList-Frontend`（`scripts/fetch-frontend.mjs`）。
-  - **过渡迁移（临时，勿长期保留）**：`src/backend/internal/model/legacy-storlane-migrate.ts` 会在 `src/backend/index.ts` 的全局中间件里幂等执行，把 `storlane_config` / `storlane_jwt_secret` / `storlane_encryption_secret` 复制到 `openlist_*`（配置 JSON 内 `site_title`/`logo`/`favicon` 归一化为 OpenList 默认）。部署一次并触发任意非 KV 代理请求即完成迁移；确认线上数据完好后删除该文件与 index.ts 调用点（第二次提交）。
-  - 迁移必须早于鉴权：`getJwtSecret` 会在 `openlist_encryption_secret` 缺失时重新生成密钥，若先跑鉴权会导致旧加密密钥被覆盖、既有密文无法解密。
-  - 回退期间遗留但未清理：前端 fork `jinzhenyi/Storlane-Frontend`（含 `edge` release 的 `i18n.tar.gz`）已不再被构建引用；GitHub 仓库名 `jinzhenyi/Storlane` 计划改回 `jinzhenyi/OpenList-Worker`，Vercel 项目名改回 `openlist-tsworker`。
+  - 品牌已从 Storlane **回退为 OpenList**：代码/README/多语言/logo/包名/KV 键均恢复（工作树等于品牌化前 `cfd28fe`）。前端构建已切回上游 `OpenListTeam/OpenList-Frontend`（`scripts/fetch-frontend.mjs`，默认取 npm 已发布 dist）。GitHub 仓库已改回 `jinzhenyi/OpenList-Worker`，Vercel 项目名已改回 `openlist-tsworker`。
+  - **一次性键迁移已完成**：通过一次临时部署（`legacy-storlane-migrate.ts` 在全局中间件幂等执行）把 `storlane_config` / `storlane_jwt_secret` / `storlane_encryption_secret` 复制到 `openlist_*`，并把配置 JSON 内 `site_title`/`logo`/`favicon` 归一化为 OpenList 默认。迁移验证通过（`db_trusted=true`、`DB_CIPHER=aes-256-gcm` 正常解密），随后已删除该临时文件与调用点。
+  - 迁移曾必须早于鉴权：`getJwtSecret` 会在 `openlist_encryption_secret` 缺失时重新生成密钥，若先跑鉴权会覆盖旧加密密钥、导致既有密文无法解密。
+  - 回退期间遗留但未清理：前端 fork `jinzhenyi/Storlane-Frontend`（含 `edge` release 的 `i18n.tar.gz`）已不再被构建引用，可保留或删除（删除需用户确认）。

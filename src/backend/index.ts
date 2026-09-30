@@ -5,7 +5,6 @@ import { assetsRouter, getIndexHtmlWithCdn, isCdnConfigured, cdnAssetRedirect } 
 import { webdavRouter } from "./server/webdav"
 import { s3Router } from "./server/s3"
 import { setEnvCtx } from "./internal/model/db"
-import { migrateLegacyStorlaneStorage } from "./internal/model/legacy-storlane-migrate"
 import { getStoreConfigErrorDetail } from "./internal/model/store/backend"
 import { storageErrorSummary, uiStorageError } from "./server/storage-error"
 
@@ -116,23 +115,11 @@ app.use("*", async (c, next) => {
   // 而不是静默退回内存模式（表现为「操作成功但数据丢失」）。
   // 静态资源与 SPA 壳放行，保证前端能加载并展示该错误。
   const { pathname } = new URL(c.req.url)
-  const isKvProxy = isKvProxyPath(pathname)
   const exempt =
     isStaticOrShell(pathname, c.req.header("accept") || "", c.req.method) ||
     isDiagnosticPath(pathname) ||
     // KV 代理传输端点：解析驱动会再探测自身，必须绕开（见 isKvProxyPath）
-    isKvProxy
-
-  // 过渡用：把 Storlane 品牌期间写入的存储键迁回 OpenList 键（幂等）。
-  // 必须早于鉴权/存储读取，避免旧密钥槽位被当成缺失而重新生成。
-  // 跳过 KV 代理端点：解析驱动会探测自身，禁止在此路径触发。
-  if (!isKvProxy) {
-    try {
-      await migrateLegacyStorlaneStorage(env)
-    } catch {
-      // 迁移失败不阻塞请求；读取路径仍会安全降级（不会写回默认库）。
-    }
-  }
+    isKvProxyPath(pathname)
   if (!exempt) {
     // 用 Detail 版本：除完整原因外还带分类码与一句话修复建议，前端据此
     // 展示「哪里错了 + 该改成什么」。只给一段长文本时，用户（和日志读者）
