@@ -102,16 +102,39 @@ graph TD
 
 ---
 
-## 如何修改
+## 如何修改（开发者指南）
 
-### 目录结构
+### 目录结构总览
 
-- `src/backend/server/`：HTTP 路由与中间件（鉴权、文件、分享、管理、WebDAV / S3 / MCP 等）。
-- `src/backend/drivers/`：78 个存储驱动，每个驱动一个子目录。
-- `src/backend/internal/`：领域逻辑与存储层（`model/store` 为持久化抽象、格式与后端驱动）。
-- `src/backend/pkg/`：加密、签名、权限、路径、XML、流等基础工具。
-- `api/`、`src/backend/worker.ts`、`esa-entry.ts`、`handler.ts`：各平台入口。
-- `scripts/`：构建与部署脚本。
+| 路径 | 职责 | 修改这里的典型场景 |
+| --- | --- | --- |
+| `api/[...route].ts` | Vercel / EdgeOne Node Serverless 入口 | 改函数 `maxDuration` / `runtime`、挂载方式 |
+| `src/backend/worker.ts` | Cloudflare Workers 入口（`export default app`，并导出 `OpenListDB`） | 改 Workers 暴露的 Durable Object |
+| `esa-entry.ts` | 阿里云 ESA 专用入口 | 适配 ESA 运行时 |
+| `handler.ts` | 通用 Serverless / Node 入口 | AWS Lambda 等 |
+| `middleware.js` | EdgeOne 根级边缘中间件（SPA 回退） | 调整 EdgeOne 上的 SPA 深链与放行路径 |
+| `functions/` | EdgeOne Edge Functions（KV 代理 `kv-get` / `kv-put` / …） | EdgeOne 上 KV 传输层 |
+| `cloud-functions/[[default]].js` | EdgeOne 云函数产物（由构建生成，勿手改） | 只在 `scripts/build-edge.mjs` 中改 |
+| `dist-server/` | Node bundle 产物（`pnpm start` 消费，由构建生成） | 只在构建脚本中改 |
+| `dist/` | 前端静态产物（由 `scripts/fetch-frontend.mjs` 拉取） | 换前端版本 / 定制前端 |
+| `src/backend/index.ts` | 应用装配：环境变量合并、路由挂载、SPA 壳、诊断豁免 | 新增全局中间件、改环境合并逻辑 |
+| `src/backend/server/` | HTTP 路由与中间件（见下表） | 新增/修改接口 |
+| `src/backend/internal/` | 领域逻辑与持久化层 | 改业务规则、存储层 |
+| `src/backend/drivers/` | 78 个存储驱动，每驱动一个子目录 | 新增/修改网盘驱动 |
+| `src/backend/pkg/` | 加密、签名、权限、路径、XML、流等基础工具 | 改通用算法/工具 |
+| `scripts/` | 构建与部署脚本 | 改构建产物、部署流程 |
+| `src/backend/internal/model/store/` | 持久化抽象：格式 + 后端驱动 | 新增存储后端或数据格式 |
+
+`src/backend/server/` 各文件职责：
+
+- `router.ts`：装配 `/api` 下的所有子路由、限流、安全响应头、CORS、`/health` 与 `/healthz`。
+- `auth.ts` / `sso.ts` / `webauthn.ts` / `ldap.ts` / `public.ts`：认证、单点登录、WebAuthn、LDAP、公开接口（含 `env_check` / `init_status`）。
+- `fs.ts` / `raw.ts` / `share.ts` / `task.ts` / `user.ts`：文件操作、原始下载、分享、离线任务、用户。
+- `admin.ts`：管理后台全部接口（存储、设置、元数据、索引、插件、审计、驱动表单配置 `driverConfigs`）。
+- `webdav.ts` / `s3.ts` / `mcp.ts`：对外协议端点。
+- `proxy_request.ts` / `storage-error.ts` / `assets.ts`：代理请求、存储错误呈现、品牌资源与 CDN 静态资源注入。
+- `middlewares.ts`：审计日志等中间件。
+- `debug.ts`：调试信息。
 
 ### 常用命令
 
@@ -125,26 +148,97 @@ pnpm run dev:unified
 # 仅运行后端 Worker（不拉取前端）
 pnpm run dev:worker
 
-# 类型检查
+# 类型检查（等同 lint）
 pnpm lint
 
-# 分模块测试
+# 环境自检：打印 /public/env_check 的诊断输出
+pnpm run env:check
+
+# 测试（分模块）
 pnpm run test:drivers
 pnpm run test:server
 pnpm run test:store
 pnpm run test:model
+pnpm run test:189
+
+# 全部测试
+pnpm run test:all
 ```
 
-### 修改代码后如何构建
+### 修改存储驱动（`src/backend/drivers/`）
 
-```bash
-# 拉取官方前端并产出各平台构建产物
-pnpm build
-```
+每个驱动一个目录，典型结构：`driver.ts`（实现类）、`types.ts`（类型）、`util.ts`（工具）、`meta.ts`（可选元数据，如 `{ name, localSort, defaultRoot, checkStatus }`）。以 `src/backend/drivers/s3/` 为模板最快。
 
-`pnpm build` 由两个脚本组成：`scripts/fetch-frontend.mjs`（拉取官方前端）与 `scripts/build-edge.mjs`（产出各平台所需产物）。若部署到 Vercel，还需在部署前额外执行 `node scripts/vercel-bundle.mjs` 打包并注入函数入口。
+新增一个驱动：
 
-### 推送到自己的仓库
+1. 复制模板目录，在 `driver.ts` 中实现 `StorageDriver` 接口（定义见 `src/backend/internal/driver/base.ts`）：`init?` / `list` / `get` / `mkdir` / `rename` / `remove` / `move` / `copy` / `put`。不支持的操作抛明确错误。
+2. 在 `src/backend/internal/op/storage.ts` 顶部 `import` 你的驱动类，并在 `createDriver()`（约 176 行）的 `if/else` 链登记驱动名。驱动名会被归一化（转小写、去除非字母数字），因此 `aliyunOpen` 与 `aliyun_open` 等价，可在一个分支里写多个别名。
+3. 在 `src/backend/server/admin.ts` 的 `driverConfigs`（约 712 行）登记前端表单：`name`、`default_mount_path`、`common`、`additional` 字段（`type` / `default` / `required` / `options` / `help`）。
+4. 跑 `pnpm lint` 与 `pnpm run test:drivers` 验证。
+
+### 修改后端接口（`src/backend/server/`）
+
+1. 在对应领域文件里新增 Hono handler（如文件相关写进 `fs.ts`，管理相关写进 `admin.ts`）。
+2. 在 `src/backend/server/router.ts` 的 `setupRouter()` 中挂载：子路由用 `app.route("/prefix", xxxRouter)`，单端点用 `app.get("/x", handler)`。
+3. 返回体统一为 `{ code, message, data }`（`code` 用 200/4xx/5xx）；错误抛 `src/backend/pkg/errs.ts` 中的错误类型。
+4. 需要登录的接口放在鉴权中间件之后；公开接口确保不依赖鉴权中间件。
+5. 注意 `router.ts` 顶部的全局中间件顺序：限流 → 审计 → 安全响应头 → CORS，新逻辑不要破坏该顺序。
+
+### 修改鉴权 / 权限 / 中间件
+
+- 认证与会话：`server/auth.ts`；单点登录 `server/sso.ts`；无密码登录 `server/webauthn.ts`；目录认证 `server/ldap.ts`。
+- 权限与密码策略：`src/backend/pkg/permission.ts`、`pkg/password.ts`、`pkg/totp.ts`、`pkg/csrf.ts`。
+- 全局中间件（限流、安全头、CORS、审计）：`server/router.ts` 与 `server/middlewares.ts`。
+- 存储配置错误拦截与诊断豁免清单：`src/backend/index.ts`（`DIAGNOSTIC_PATHS` / `KV_PROXY_PATHS`）。
+
+### 修改持久化层（`src/backend/internal/model/store/`）
+
+- **数据格式**（`format/`）：`map.ts`（整对象 JSON）、`key.ts`（按实体拆分）、`sql.ts`（关系表，兼容 Go 版物理库）。实现 `FormatAdapter`（`load` / `save`）。
+- **存储后端**（`driver/`）：`vblob.ts`、`blob.ts`、`kv.ts`、`cfkv.ts`、`d1.ts`、`do.ts`、`mysql.ts`、`postgres.ts`、`memory.ts`。实现 `Driver` 接口（`isAvailable` / `init` / `load` / `save` / `health` 等）。
+- **选择逻辑**（`backend.ts`）：`readDriver()` / `readFormat()` / `readCipher()` 解析环境变量，`resolveDriver()` 探测/构造驱动，`getStorageBackend()` 做「驱动 × 格式」合法性校验并缓存。新增后端时在此登记，并遵守「显式指定不回退」原则。
+- **密钥与加密**：字段加密密钥由 `JWT_SECRET` 派生（`pkg/crypto.ts`）。启用 `DB_CIPHER` 后更换 `JWT_SECRET` 会导致已加密字段无法解密；如需更换，先设 `DB_CIPHER=none` 并保存一次完成明文迁移。
+- **历史数据迁移**：设置项迁移表在 `db.ts` 的 `LEGACY_SETTING_MIGRATIONS`，初始化时自动执行。一次性迁移可新建独立模块并在 `src/backend/index.ts` 的早期中间件调用（务必在鉴权之前，且避开 KV 代理路径）。
+- **接入新运行时的 KV**：EdgeOne 的 KV 只能由 Edge Function 访问，`functions/kv-*` 提供 HTTP 代理；Node 侧经 `src/backend/index.ts` 注入的 origin 拼接绝对地址调用。
+
+### 修改环境变量与配置
+
+1. 在 `.env.example` 增加变量并写注释（现有：`JWT_SECRET`、`ADMIN_PASS`、`ALLOW_URLS`、`ASSET_URLS`、`MYSQL_URLS`、`EO_KV_URLS`、`CF_ACCOUNT`、`CF_KV_UUID`、`CF_API_KEY`、`BLOB_READ_WRITE_TOKEN`、`POSTGRES_URL`、`CRON_SECRET`）。
+2. 读取时统一 `env?.FOO ?? process.env.FOO`。`src/backend/index.ts` 已把 `process.env` 合并进 `c.env`（Vercel / Node 容器把配置放在 `process.env`，Hono 的 `c.env` 默认为空）。
+3. 改完用 `pnpm run env:check` 确认 `config` / `storage` / `jwt` / `ready` 状态。
+
+### 修改前端（`dist/` 与品牌资源）
+
+后端不维护前端源码，前端统一取官方 `OpenList-Frontend` 产物。`scripts/fetch-frontend.mjs` 的来源优先级（高 → 低）：
+
+1. `FRONTEND_DIST`：已构建好的 `dist` 目录路径（最快）。
+2. `FRONTEND_REPO`：本地官方前端仓库路径（自动 install + build）。
+3. 同级目录 `../OpenList-Frontend`（自动探测）。
+4. 默认：从 npm registry 下载官方**已发布** dist（可用 `FRONTEND_VERSION` 固定版本）。
+5. `FRONTEND_BUILD_FROM_SOURCE=1`：克隆前端 `main` 并现场构建。
+
+默认取「已发布 dist」，是为了让本地 `index.html` 的哈希与 CDN 上的 npm 包天然同源，`ASSET_URLS` 的路径 A 才能命中（npmmirror 等镜像禁止访问 `.html`）。
+
+- **换前端版本**：`FRONTEND_VERSION=4.2.6 pnpm build`。
+- **用自构建前端**：`FRONTEND_DIST=/path/to/dist pnpm build`（或 `FRONTEND_REPO` / `FRONTEND_BUILD_FROM_SOURCE=1`）。
+- **CDN 加速**：设 `ASSET_URLS` 后，`server/assets.ts` 把 CDN 地址注入 `index.html` 的 `window.OPENLIST_CONFIG.cdn`，浏览器直连 CDN 加载资源。
+- **站点图标**：`/logo.svg`、`/logo.png`、`/favicon.ico` 等统一由 `server/assets.ts` 302 到官方 CDN logo。
+- **SPA 深链回退**：Vercel 由 `vercel.json` 的 `rewrites` 处理；EdgeOne 由 `middleware.js` 处理；其它运行时的兜底在 `src/backend/index.ts`。
+
+### 各平台入口与构建产物
+
+| 目标平台 | 入口 / 配置 | 产物与命令 |
+| --- | --- | --- |
+| Cloudflare Workers | `src/backend/worker.ts`、`wrangler.jsonc` | `wrangler deploy`（`pnpm run deploy:worker` 或 `node scripts/deploy.js`） |
+| Vercel Serverless | `api/[...route].ts`、`vercel.json` | `vercel build --prod` → `node scripts/vercel-bundle.mjs` → `vercel deploy --prebuilt --prod` |
+| EdgeOne Makers | `api/[...route].ts` + `middleware.js` + `functions/` | `cloud-functions/[[default]].js`（`pnpm build` 产出） |
+| 阿里云 ESA | `esa-entry.ts` | `dist/esa-entry.js`（`pnpm build` 产出） |
+| Node.js 容器 | `api/[...route].ts` | `dist-server/api/[...route].js`（`pnpm start`） |
+
+`pnpm build` = `scripts/fetch-frontend.mjs`（拉前端）+ `scripts/build-edge.mjs`（esbuild 产出 `dist-server/`、`cloud-functions/`、`esa-entry.js`）。`scripts/build-edge.mjs` 会把 `sftp` / `ftp` 等依赖原生 `.node` 的驱动替换为空桩，避免 EdgeOne / ESA 二次打包失败。
+
+Vercel 额外需要 `scripts/vercel-bundle.mjs`：Vercel 的 `@vercel/node` 只做逐文件转译，不解析无扩展名 ESM 导入，该脚本用 esbuild 把 `api/[...route].ts` 打成自包含单文件并覆盖函数入口。
+
+### 推送到自己的仓库并部署
 
 ```bash
 # 添加上游与你自己的远端
@@ -156,7 +250,7 @@ git commit -m "feat: your change"
 git push jinzhenyi main
 ```
 
-推送后，若项目已与 Vercel / Cloudflare 等平台绑定 Git 集成，平台会自动构建部署；也可用各平台 CLI 发布，Vercel 的预构建流程为：
+推送后若已绑定 Git 集成，平台会自动构建；也可用 CLI 发布。Vercel 预构建流程：
 
 ```bash
 vercel build --prod
@@ -164,16 +258,13 @@ node scripts/vercel-bundle.mjs
 vercel deploy --prebuilt --prod
 ```
 
-### 修改站点配置
+### 常见坑
 
-运行配置通过环境变量提供，示例与说明见 [`.env.example`](./.env.example)。常用项：
-
-- `DB_DRIVER` / `DB_FORMAT`：存储驱动与格式（如 `vblob` + `map`、`postgres` + `sql`）。
-- `DB_CIPHER`：敏感字段落盘加密算法（默认 `none`，推荐 `aes-256-gcm`）。
-- `JWT_SECRET`：会话签名密钥，同时作为字段加密的密钥派生材料；启用加密后请勿随意更换。
-- `CRON_SECRET`：定时任务端点鉴权密钥。
-
-> 注意：加密密钥由 `JWT_SECRET` 派生。启用 `DB_CIPHER` 后若更换 `JWT_SECRET`，已加密字段将无法解密；如需更换，先设 `DB_CIPHER=none` 并保存一次完成明文迁移。
+- `pnpm lint` 是 `tsc -p tsconfig.json --noEmit`，改完代码务必先过类型检查。
+- Vercel 上必须跑 `scripts/vercel-bundle.mjs`，否则报 `ERR_MODULE_NOT_FOUND`。
+- 加密密钥由 `JWT_SECRET` 派生，启用 `DB_CIPHER` 后不要随意更换 `JWT_SECRET`。
+- 一次性数据迁移必须早于鉴权执行，且跳过 `/kv-*` 代理路径。
+- Serverless 运行时不会静默回退 memory（避免「保存成功」但数据丢失），探测不到持久化会直接报错。
 
 ---
 
